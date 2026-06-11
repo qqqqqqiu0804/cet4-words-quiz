@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>四级高频词自测 | 分类刷题 + 错题本</title>
+<style>
+:root {
+  --bg: #f4f6f9;
+  --card: #fff;
+  --text: #2c3e50;
+  --text-secondary: #64748b;
+  --border: #e5e7eb;
+  --primary: #409eff;
+  --primary-hover: #337ecc;
+  --success: #67c23a;
+  --error: #f56c6c;
+  --warning: #e6a23c;
+  --input-bg: #fff;
+  --tag-bg: #ecf5ff;
+  --tag-text: #409eff;
+  --shadow: 0 2px 15px rgba(0,0,0,0.1);
+  --radius: 8px;
+  --transition: .25s ease;
+  --disabled-bg: #c0c4cc;
+  --hover-bg: #f0f2f5;
+  --wrong-bg: #fef0f0;
+  --right-bg: #f0f9eb;
+  --rewrite-bg: #fff8e1;
+  --rewrite-border: #ffc107;
+}
+[data-theme="dark"] {
+  --bg: #1a1a2e;
+  --card: #16213e;
+  --text: #e0e0e0;
+  --text-secondary: #a0aec0;
+  --border: #2d3748;
+  --primary: #667eea;
+  --primary-hover: #5a6fd6;
+  --input-bg: #2d3748;
+  --tag-bg: #2d3748;
+  --tag-text: #a5b4fc;
+  --shadow: 0 2px 15px rgba(0,0,0,0.4);
+  --disabled-bg: #4a5568;
+  --hover-bg: #2d3748;
+  --wrong-bg: #3b1c1c;
+  --right-bg: #1c3b1c;
+  --rewrite-bg: #3d3520;
+  --rewrite-border: #ffc107;
+}
+[data-theme="eye-care"] {
+  --bg: #f4ecd8;
+  --card: #faf6eb;
+  --text: #4a3728;
+  --text-secondary: #7a6b5c;
+  --border: #d4c5a9;
+  --primary: #6b9b5a;
+  --primary-hover: #5a8a4a;
+  --input-bg: #fef9ee;
+  --tag-bg: #e8f5e0;
+  --tag-text: #4a7c3f;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --disabled-bg: #c8c0a8;
+  --hover-bg: #f5f0e0;
+  --wrong-bg: #fce8e6;
+  --right-bg: #e6f4e0;
+  --rewrite-bg: #fef5e0;
+  --rewrite-border: #d4a017;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 16px;
+  transition: background var(--transition), color var(--transition);
+  min-height: 100vh;
+}
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  background: var(--card);
+  padding: 28px 24px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; margin-bottom: 20px; padding-bottom: 14px;
+  border-bottom: 2px solid var(--primary);
+}
+.header h1 { font-size: 22px; color: var(--text); }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.theme-btn {
+  padding: 6px 12px; font-size: 13px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--text); cursor: pointer; transition: all var(--transition);
+}
+.theme-btn:hover { border-color: var(--primary); color: var(--primary); }
+.theme-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.stats-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.stat-card {
+  flex: 1; min-width: 90px; text-align: center; padding: 12px 8px;
+  background: var(--hover-bg); border-radius: var(--radius);
+  transition: background var(--transition);
+}
+.stat-card .num { font-size: 24px; font-weight: 700; }
+.stat-card .label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.stat-card.total .num { color: var(--primary); }
+.stat-card.right .num { color: var(--success); }
+.stat-card.wrong .num { color: var(--error); }
+.stat-card.rate .num { color: var(--warning); }
+
+.cat-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+.cat-bar > span { font-size: 13px; color: var(--text-secondary); margin-right: 4px; white-space: nowrap; }
+.cat-btn {
+  padding: 5px 14px; font-size: 13px; border: 1px solid var(--border);
+  border-radius: 20px; background: var(--card); color: var(--text-secondary);
+  cursor: pointer; transition: all var(--transition); white-space: nowrap;
+}
+.cat-btn:hover { border-color: var(--primary); color: var(--primary); }
+.cat-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.tool-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+.mode-label { font-size: 13px; color: var(--text-secondary); margin-right: 4px; white-space: nowrap; }
+
+.btn {
+  padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer;
+  font-size: 14px; transition: all var(--transition); white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.btn:disabled { background: var(--disabled-bg) !important; cursor: not-allowed; opacity: 0.65; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+.btn-warning { background: var(--warning); color: #fff; }
+.btn-warning:hover:not(:disabled) { background: #d49028; }
+.btn-danger { background: var(--error); color: #fff; }
+.btn-danger:hover:not(:disabled) { background: #e45757; }
+.btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+.btn-outline:hover:not(:disabled) { background: var(--primary); color: #fff; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover:not(:disabled) { background: #5daf34; }
+
+.quiz-box {
+  margin: 16px 0; padding: 24px; border: 2px solid var(--border);
+  border-radius: var(--radius); background: var(--card);
+  transition: all var(--transition); position: relative;
+}
+.quiz-box.correct { border-color: var(--success); background: var(--right-bg); }
+.quiz-box.incorrect { border-color: var(--error); background: var(--wrong-bg); }
+
+/* 答错后照打区域 */
+.rewrite-box {
+  margin-top: 16px; padding: 18px; border: 2px dashed var(--rewrite-border);
+  border-radius: var(--radius); background: var(--rewrite-bg);
+  animation: fadeInUp .35s ease;
+}
+.rewrite-box .rewrite-title {
+  font-size: 15px; font-weight: 600; color: var(--warning); margin-bottom: 8px;
+}
+.rewrite-box .rewrite-target {
+  font-size: 20px; font-weight: 700; color: var(--primary);
+  margin-bottom: 10px; letter-spacing: 1px;
+}
+.rewrite-box .rewrite-input-row {
+  display: flex; gap: 10px;
+}
+.rewrite-box .rewrite-input-row input {
+  flex: 1; padding: 10px 14px; font-size: 16px; border: 2px solid var(--border);
+  border-radius: var(--radius); background: var(--input-bg); color: var(--text);
+  outline: none; transition: border var(--transition); min-width: 0;
+}
+.rewrite-box .rewrite-input-row input:focus { border-color: var(--primary); }
+.rewrite-box .rewrite-input-row input.match { border-color: var(--success); background: var(--right-bg); }
+.rewrite-box .rewrite-input-row input.mismatch { border-color: var(--error); background: var(--wrong-bg); }
+.rewrite-feedback { font-size: 14px; margin-top: 8px; min-height: 20px; }
+
+.cat-tag {
+  display: inline-block; font-size: 12px; padding: 2px 10px;
+  border-radius: 12px; background: var(--tag-bg); color: var(--tag-text); margin-bottom: 12px;
+}
+
+.q-text {
+  font-size: 20px; margin: 12px 0; color: var(--text);
+  min-height: 30px; line-height: 1.6; word-break: break-word;
+}
+
+.input-row { display: flex; gap: 10px; margin: 12px 0; }
+.input-row input {
+  flex: 1; padding: 10px 14px; font-size: 16px; border: 2px solid var(--border);
+  border-radius: var(--radius); background: var(--input-bg); color: var(--text);
+  outline: none; transition: border var(--transition); min-width: 0;
+}
+.input-row input:focus { border-color: var(--primary); }
+
+.result {
+  margin-top: 12px; font-size: 16px; font-weight: 500;
+  min-height: 24px; opacity: 0; transition: opacity .3s ease;
+}
+.result.show { opacity: 1; }
+.result.right { color: var(--success); }
+.result.wrong { color: var(--error); }
+.result .paraphrase { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+.nav-bar { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+.nav-bar .nav-info { font-size: 13px; color: var(--text-secondary); margin: 0 8px; }
+
+.error-panel {
+  margin-top: 20px; border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; transition: all var(--transition);
+}
+.error-panel-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; background: var(--hover-bg); cursor: pointer;
+  user-select: none; transition: background var(--transition);
+}
+.error-panel-header:hover { opacity: 0.9; }
+.error-panel-header h2 { font-size: 16px; color: var(--text); }
+.error-panel-header .arrow { transition: transform var(--transition); font-size: 12px; }
+.error-panel.open .error-panel-header .arrow { transform: rotate(180deg); }
+.error-panel-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+.error-panel.open .error-panel-body { max-height: 600px; overflow-y: auto; }
+
+.error-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 18px; border-bottom: 1px solid var(--border);
+  font-size: 14px; gap: 8px; flex-wrap: wrap;
+}
+.error-item:last-child { border-bottom: none; }
+.error-item .word-pair { flex: 1; min-width: 0; }
+.error-item .word-pair .en { color: var(--primary); font-weight: 500; }
+.error-item .word-pair .cn { color: var(--text-secondary); margin-left: 8px; }
+.error-item .error-count { font-size: 12px; color: var(--error); white-space: nowrap; }
+
+.empty-state { text-align: center; padding: 32px 16px; color: var(--text-secondary); font-size: 14px; }
+
+@media (max-width: 600px) {
+  .container { padding: 16px 12px; }
+  .header h1 { font-size: 18px; }
+  .quiz-box { padding: 16px; }
+  .q-text { font-size: 17px; }
+  .input-row, .rewrite-box .rewrite-input-row { flex-direction: column; }
+  .input-row .btn, .rewrite-box .rewrite-input-row .btn { width: 100%; }
+  .stat-card .num { font-size: 20px; }
+  .btn { padding: 8px 12px; font-size: 13px; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.quiz-box { animation: fadeInUp .35s ease; }
+.rewrite-box { animation: fadeInUp .35s ease; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>📖 大学英语四级高频词 智能自测</h1>
+    <div class="header-actions">
+      <button class="theme-btn active" onclick="setTheme('light')">☀ 日间</button>
+      <button class="theme-btn" onclick="setTheme('dark')">🌙 夜间</button>
+      <button class="theme-btn" onclick="setTheme('eye-care')">🍃 护眼</button>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-card total"><div class="num" id="totalCount">0</div><div class="label">总答题数</div></div>
+    <div class="stat-card right"><div class="num" id="rightCount">0</div><div class="label">答对数</div></div>
+    <div class="stat-card wrong"><div class="num" id="wrongCount">0</div><div class="label">答错数</div></div>
+    <div class="stat-card rate"><div class="num" id="rateText">0%</div><div class="label">正确率</div></div>
+  </div>
+
+  <div class="cat-bar">
+    <span>分类选题：</span>
+    <button class="cat-btn active" onclick="setCategory('all')">全部</button>
+    <button class="cat-btn" onclick="setCategory('politics')">时政</button>
+    <button class="cat-btn" onclick="setCategory('tech')">科技</button>
+    <button class="cat-btn" onclick="setCategory('culture')">社会文化</button>
+    <button class="cat-btn" onclick="setCategory('campus')">校园</button>
+    <button class="cat-btn" onclick="setCategory('medical')">医疗</button>
+    <button class="cat-btn" onclick="setCategory('economy')">经济</button>
+    <button class="cat-btn" onclick="setCategory('environment')">环保</button>
+    <button class="cat-btn" onclick="setCategory('writing')">写作</button>
+    <button class="cat-btn" onclick="setCategory('research')">科研</button>
+  </div>
+
+  <div class="tool-bar">
+    <span class="mode-label">当前模式：<strong id="modeText">中译英</strong></span>
+    <button class="btn btn-outline btn-sm" onclick="switchMode('cn2en')">中译英</button>
+    <button class="btn btn-outline btn-sm" onclick="switchMode('en2cn')">英译中</button>
+    <span style="flex:1"></span>
+    <span class="mode-label">刷题：</span>
+    <button class="btn btn-outline btn-sm" id="modeSeqBtn" onclick="toggleSeqMode()">顺序</button>
+    <button class="btn btn-outline btn-sm" id="modeRandBtn" onclick="toggleSeqMode()">随机</button>
+  </div>
+
+  <div class="quiz-box" id="quizBox">
+    <div class="cat-tag" id="catTag" style="display:none"></div>
+    <div class="q-text" id="question">请点击下方按钮开始答题</div>
+    <div class="input-row" id="answerRow">
+      <input type="text" id="userInput" placeholder="在此输入答案，按回车提交" autocomplete="off">
+      <button class="btn btn-primary" id="submitBtn" onclick="checkAnswer()">提交答案</button>
+    </div>
+    <div class="result" id="resText"></div>
+    <!-- 答错后照打区域 -->
+    <div id="rewriteArea" style="display:none"></div>
+    <div class="nav-bar">
+      <button class="btn btn-outline btn-sm" id="prevBtn" onclick="prevQuestion()" disabled>◀ 上一题</button>
+      <span class="nav-info" id="navInfo"></span>
+      <button class="btn btn-outline btn-sm" id="nextBtn" onclick="nextQuestion()" disabled>下一题 ▶</button>
+      <span style="flex:1"></span>
+      <button class="btn btn-primary btn-sm" onclick="getQuestion()">随机抽题</button>
+      <button class="btn btn-warning btn-sm" onclick="redoError()">重做错题</button>
+      <button class="btn btn-danger btn-sm" onclick="clearErrors()">清空错题本</button>
+    </div>
+  </div>
+
+  <div class="error-panel" id="errorPanel">
+    <div class="error-panel-header" onclick="toggleErrorPanel()">
+      <h2>📋 错题本（<span id="errorCount">0</span>题）</h2>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="error-panel-body" id="errorBody"></div>
+  </div>
+</div>
+
+<script>
+// ==================== 词库（9大分类，完整版） ====================
+const wordList = [
+  // ===== 1. 时政类 =====
+  { en:"Reform and Opening-up", cn:"改革开放", cat:"politics" },
+  { en:"Since the reform and opening up", cn:"改革开放以来", cat:"politics" },
+  { en:"Belt and Road initiative", cn:"一带一路倡议", cat:"politics" },
+  { en:"urbanization", cn:"城市化", cat:"politics" },
+  { en:"rural revitalization", cn:"乡村振兴", cat:"politics" },
+  { en:"Poverty alleviation", cn:"脱贫，扶贫", cat:"politics", note:"也说 alleviate poverty" },
+  { en:"alleviate poverty", cn:"脱贫，扶贫", cat:"politics" },
+  { en:"productivity", cn:"生产力", cat:"politics" },
+  { en:"New quality productive force", cn:"新质生产力", cat:"politics" },
+  { en:"High quality development", cn:"高质量发展", cat:"politics" },
+  { en:"Chinese modernization", cn:"中国式现代化", cat:"politics" },
+  { en:"Airport", cn:"机场", cat:"politics" },
+  { en:"high-speed rail station", cn:"高铁站", cat:"politics" },
+  { en:"delta", cn:"三角洲", cat:"politics" },
+  { en:"Yangtze River delta", cn:"长江三角洲", cat:"politics" },
+  { en:"Greater Bay Area", cn:"大湾区", cat:"politics" },
+  { en:"Pilot Free Trade Zone", cn:"实验自由贸易区", cat:"politics" },
+  { en:"Silver economy", cn:"银发经济", cat:"politics", note:"面向老年人的经济产业" },
+  { en:"Aging society", cn:"老龄化社会", cat:"politics", note:"也说 aging community" },
+  { en:"Aging community", cn:"老龄化社会", cat:"politics" },
+  { en:"The elderly care service", cn:"养老服务", cat:"politics" },
+  { en:"Social welfare", cn:"社会福利", cat:"politics" },
+  { en:"Social security", cn:"社会保障", cat:"politics" },
+
+  // ===== 2. 科技类 =====
+  { en:"AI", cn:"人工智能", cat:"tech", note:"artificial intelligence 缩写" },
+  { en:"artificial intelligence", cn:"人工智能", cat:"tech", note:"简称 AI" },
+  { en:"Artificial", cn:"人造的", cat:"tech" },
+  { en:"manual", cn:"手工的，人力的", cat:"tech" },
+  { en:"Intelligence", cn:"智能，情报", cat:"tech" },
+  { en:"Intelligent", cn:"智能的", cat:"tech" },
+  { en:"smart", cn:"智能的", cat:"tech" },
+  { en:"Smart economy", cn:"智能经济", cat:"tech" },
+  { en:"smart device", cn:"智能设备", cat:"tech" },
+  { en:"AI agent", cn:"智能体", cat:"tech" },
+  { en:"LLM", cn:"大语言模型", cat:"tech", note:"large language model" },
+  { en:"large language model", cn:"大语言模型", cat:"tech", note:"简称 LLM" },
+  { en:"token", cn:"词元", cat:"tech" },
+  { en:"Cryptocurrency", cn:"虚拟货币", cat:"tech" },
+  { en:"Blockchain", cn:"区块链", cat:"tech" },
+  { en:"Digital economy", cn:"数字经济", cat:"tech" },
+  { en:"Digitization", cn:"数字化", cat:"tech" },
+  { en:"E-Commerce", cn:"电子商务", cat:"tech" },
+  { en:"Algorithm", cn:"算法", cat:"tech" },
+  { en:"Social media", cn:"社交媒体", cat:"tech" },
+  { en:"Big data", cn:"大数据", cat:"tech" },
+  { en:"Cloud computing", cn:"云计算", cat:"tech" },
+  { en:"VR", cn:"虚拟现实", cat:"tech", note:"virtual reality" },
+  { en:"virtual reality", cn:"虚拟现实", cat:"tech", note:"简称 VR" },
+  { en:"MR", cn:"混合现实", cat:"tech", note:"mixed reality" },
+  { en:"mixed reality", cn:"混合现实", cat:"tech", note:"简称 MR" },
+  { en:"AR", cn:"增强现实", cat:"tech", note:"augmented reality" },
+  { en:"augmented reality", cn:"增强现实", cat:"tech", note:"简称 AR" },
+  { en:"5G", cn:"第五代移动通信技术", cat:"tech" },
+  { en:"Driverless car", cn:"无人驾驶汽车", cat:"tech" },
+  { en:"Self-driving car", cn:"无人驾驶汽车", cat:"tech" },
+  { en:"autonomous vehicle", cn:"无人驾驶汽车", cat:"tech" },
+  { en:"Assisted driving", cn:"辅助驾驶", cat:"tech" },
+  { en:"Renewable energy", cn:"新能源，可再生能源", cat:"tech" },
+  { en:"Solar power", cn:"太阳能", cat:"tech" },
+  { en:"Wind power", cn:"风能", cat:"tech" },
+  { en:"Hydro power", cn:"水电", cat:"tech" },
+  { en:"Battery", cn:"电池", cat:"tech" },
+  { en:"Cyber security", cn:"网络安全", cat:"tech" },
+  { en:"Privacy", cn:"隐私", cat:"tech" },
+  { en:"Data security", cn:"数据安全", cat:"tech" },
+  { en:"IOT", cn:"物联网", cat:"tech", note:"Internet of Things" },
+  { en:"Internet of Things", cn:"物联网", cat:"tech", note:"简称 IoT" },
+
+  // ===== 3. 社会文化类 =====
+  { en:"Discrimination", cn:"歧视", cat:"culture" },
+  { en:"Bias", cn:"偏见", cat:"culture" },
+  { en:"Prejudice", cn:"偏见", cat:"culture" },
+  { en:"Stereotype", cn:"刻板印象", cat:"culture" },
+  { en:"Cliche", cn:"陈词滥调", cat:"culture" },
+  { en:"Workplace discrimination", cn:"职场歧视", cat:"culture" },
+  { en:"sexism", cn:"性别歧视", cat:"culture" },
+  { en:"Racism", cn:"种族歧视", cat:"culture" },
+  { en:"Career development", cn:"职业发展", cat:"culture" },
+  { en:"Quit", cn:"辞职", cat:"culture", note:"也说 resign" },
+  { en:"resign", cn:"辞职", cat:"culture" },
+  { en:"Unemployment", cn:"失业", cat:"culture" },
+  { en:"peer pressure", cn:"同辈压力", cat:"culture" },
+  { en:"Work-life balance", cn:"工作生活平衡", cat:"culture" },
+  { en:"lifelong learning", cn:"终身学习", cat:"culture" },
+  { en:"Traditional", cn:"传统的", cat:"culture", note:"也说 conventional" },
+  { en:"conventional", cn:"传统的", cat:"culture" },
+  { en:"Custom", cn:"风俗", cat:"culture" },
+  { en:"Intangible culture", cn:"非物质文化", cat:"culture" },
+  { en:"Inherit", cn:"继承", cat:"culture" },
+  { en:"craftsmanship", cn:"工艺", cat:"culture" },
+  { en:"craftsman spirit", cn:"工匠精神", cat:"culture" },
+  { en:"Exquisite craftsmanship", cn:"精湛的工艺", cat:"culture" },
+  { en:"National treasure", cn:"国宝", cat:"culture" },
+  { en:"Dynasty", cn:"朝代", cat:"culture", note:"如 Tang Dynasty 唐朝" },
+  { en:"Symbol", cn:"象征", cat:"culture", note:"动词 symbolize / 形容词 symbolic" },
+  { en:"symbolize", cn:"是…的象征", cat:"culture" },
+  { en:"symbolic", cn:"象征性的", cat:"culture" },
+  { en:"Prosperity", cn:"繁荣", cat:"culture", note:"形容词 prosperous" },
+  { en:"prosperous", cn:"繁荣的", cat:"culture" },
+  { en:"common prosperity", cn:"共同富裕", cat:"culture" },
+  { en:"Ceremony", cn:"仪式", cat:"culture", note:"也说 ritual" },
+  { en:"ritual", cn:"仪式", cat:"culture" },
+
+  // ===== 4. 校园话题类 =====
+  // 学生与学位
+  { en:"Student", cn:"学生", cat:"campus" },
+  { en:"freshman", cn:"大一学生", cat:"campus" },
+  { en:"sophomore", cn:"大二学生", cat:"campus" },
+  { en:"junior student", cn:"大三学生", cat:"campus" },
+  { en:"senior student", cn:"大四学生", cat:"campus" },
+  { en:"graduate", cn:"毕业生", cat:"campus" },
+  { en:"community college", cn:"社区学院", cat:"campus" },
+  { en:"College", cn:"学院", cat:"campus", note:"也说 university 大学" },
+  { en:"university", cn:"大学", cat:"campus" },
+  { en:"associate bachelor", cn:"副学士（学位）", cat:"campus" },
+  { en:"Undergraduate", cn:"本科生", cat:"campus" },
+  { en:"bachelor degree", cn:"本科学位", cat:"campus" },
+  { en:"Diploma", cn:"毕业文凭", cat:"campus" },
+  { en:"Postgraduate", cn:"研究生", cat:"campus" },
+  { en:"master", cn:"硕士", cat:"campus" },
+  { en:"doctor", cn:"博士", cat:"campus" },
+  { en:"Doctorate", cn:"博士学位", cat:"campus", note:"也说 PhD" },
+  { en:"PhD", cn:"博士学位", cat:"campus" },
+  // 校园设施
+  { en:"School", cn:"学校", cat:"campus" },
+  { en:"Campus", cn:"校园", cat:"campus" },
+  { en:"clinic", cn:"诊所", cat:"campus" },
+  { en:"library", cn:"图书馆", cat:"campus" },
+  { en:"Dining hall", cn:"食堂", cat:"campus" },
+  { en:"dormitory", cn:"宿舍", cat:"campus" },
+  // 课程与教学
+  { en:"Class", cn:"课程", cat:"campus" },
+  { en:"Lecture", cn:"讲座", cat:"campus" },
+  { en:"lesson", cn:"课程", cat:"campus" },
+  { en:"curriculum", cn:"课程大纲", cat:"campus" },
+  { en:"Extracurricular", cn:"课外的", cat:"campus" },
+  { en:"teacher", cn:"老师", cat:"campus" },
+  { en:"Lecturer", cn:"讲师", cat:"campus" },
+  { en:"professor", cn:"教授", cat:"campus" },
+  { en:"Associate professor", cn:"副教授", cat:"campus" },
+  { en:"Tutor", cn:"导师", cat:"campus", note:"也说 instructor" },
+  { en:"instructor", cn:"导师", cat:"campus" },
+  { en:"Faculty", cn:"全体教员", cat:"campus", note:"与 facility（设施）区分" },
+  { en:"facility", cn:"设施", cat:"campus" },
+  // 作业与学习
+  { en:"Homework", cn:"作业", cat:"campus" },
+  { en:"Assignment", cn:"任务，作业", cat:"campus" },
+  { en:"Assign", cn:"分配", cat:"campus" },
+  { en:"Handout", cn:"讲义，手册", cat:"campus" },
+  { en:"Internship", cn:"实习", cat:"campus" },
+  { en:"fieldwork", cn:"实地工作", cat:"campus" },
+  { en:"field trip", cn:"实地考察", cat:"campus" },
+  { en:"Online courses", cn:"网课", cat:"campus" },
+  { en:"MOOCs", cn:"慕课", cat:"campus", note:"massive open online course 大型开放式网络课程" },
+  { en:"Online education", cn:"网络教育", cat:"campus" },
+  { en:"distance learning", cn:"远程教育", cat:"campus" },
+  { en:"Internet-based learning", cn:"基于网络的教学", cat:"campus" },
+  { en:"Telemedicine", cn:"远程医疗", cat:"campus" },
+  { en:"Cram", cn:"填鸭式教学", cat:"campus" },
+  { en:"cram school", cn:"补习学校", cat:"campus" },
+  { en:"Thesis", cn:"论文", cat:"campus" },
+  { en:"Plagiarism", cn:"抄袭", cat:"campus" },
+  { en:"AI generated", cn:"AI生成", cat:"campus" },
+  { en:"Plagiarist", cn:"抄袭者", cat:"campus" },
+  { en:"Tuition", cn:"学费", cat:"campus" },
+  { en:"scholarship", cn:"奖学金", cat:"campus" },
+  { en:"Certificate", cn:"证书", cat:"campus" },
+
+  // ===== 5. 医疗健康类 =====
+  { en:"Health", cn:"健康", cat:"medical", note:"形容词 healthy" },
+  { en:"fitness", cn:"健康", cat:"medical" },
+  { en:"healthy", cn:"健康的", cat:"medical" },
+  { en:"Medical", cn:"医疗的", cat:"medical" },
+  { en:"medicine", cn:"药物", cat:"medical" },
+  { en:"Pill", cn:"药片", cat:"medical" },
+  { en:"capsule", cn:"胶囊", cat:"medical" },
+  { en:"Illness", cn:"疾病", cat:"medical" },
+  { en:"disease", cn:"疾病（更严重）", cat:"medical" },
+  { en:"Diabetes", cn:"糖尿病", cat:"medical" },
+  { en:"Stroke", cn:"中风", cat:"medical", note:"heart stroke 心脏病发作" },
+  { en:"High blood pressure", cn:"高血压", cat:"medical", note:"也说 hypertension" },
+  { en:"hypertension", cn:"高血压", cat:"medical" },
+  { en:"Heart attack", cn:"心脏病发作", cat:"medical" },
+  { en:"Obesity", cn:"肥胖", cat:"medical", note:"形容词 obese / fat" },
+  { en:"obese", cn:"肥胖的", cat:"medical" },
+  { en:"Immunity", cn:"免疫力", cat:"medical", note:"形容词 immune" },
+  { en:"immune", cn:"免疫的", cat:"medical" },
+  { en:"Immune system", cn:"免疫系统", cat:"medical" },
+  { en:"bacteria", cn:"细菌", cat:"medical" },
+  { en:"virus", cn:"病毒", cat:"medical", note:"go viral 病毒式传播" },
+  { en:"microorganism", cn:"微生物", cat:"medical" },
+  { en:"Infection", cn:"感染", cat:"medical" },
+  { en:"Injection", cn:"注射", cat:"medical" },
+  { en:"Pandemic", cn:"流行病，全球传染病", cat:"medical" },
+  { en:"Vaccination", cn:"接种疫苗", cat:"medical", note:"动词 vaccinate" },
+  { en:"vaccinate", cn:"接种疫苗", cat:"medical" },
+  { en:"Epidemic", cn:"流行病", cat:"medical" },
+  { en:"Face mask", cn:"口罩", cat:"medical" },
+  { en:"dementia", cn:"痴呆", cat:"medical" },
+  { en:"Symptom", cn:"症状", cat:"medical" },
+  { en:"Diagnose", cn:"诊断(v.)", cat:"medical", note:"名词 diagnosis" },
+  { en:"diagnosis", cn:"诊断(n.)", cat:"medical" },
+  { en:"Mental state", cn:"心理状况", cat:"medical" },
+  { en:"Anxiety", cn:"焦虑", cat:"medical" },
+  { en:"Depression", cn:"抑郁症", cat:"medical" },
+
+  // ===== 6. 经济发展类 =====
+  { en:"Tax", cn:"税", cat:"economy", note:"也说 taxation" },
+  { en:"taxation", cn:"税", cat:"economy" },
+  { en:"Levy tax on", cn:"征收税", cat:"economy" },
+  { en:"Tariff", cn:"关税", cat:"economy" },
+  { en:"Financial", cn:"财政的，财务的", cat:"economy" },
+  { en:"Fiscal", cn:"财务的", cat:"economy" },
+  { en:"private economy", cn:"民营经济", cat:"economy" },
+  { en:"state-owned economy", cn:"国有经济", cat:"economy" },
+  { en:"Improve business environment", cn:"优化营商环境", cat:"economy" },
+  { en:"Advanced manufacturing", cn:"先进制造业", cat:"economy" },
+  { en:"Supply chain", cn:"供应链", cat:"economy" },
+  { en:"Industrial chain", cn:"产业链", cat:"economy" },
+  { en:"Chain shop", cn:"连锁店", cat:"economy" },
+  { en:"Inflation", cn:"通货膨胀", cat:"economy" },
+  { en:"Deflation", cn:"通货紧缩", cat:"economy" },
+  { en:"Stimulus", cn:"刺激", cat:"economy" },
+
+  // ===== 7. 环保类 =====
+  { en:"Environmentally friendly", cn:"环境友好的", cat:"environment" },
+  { en:"Environmental protection", cn:"环境保护", cat:"environment" },
+  { en:"Pollution", cn:"污染", cat:"environment" },
+  { en:"Global warming", cn:"全球变暖", cat:"environment" },
+  { en:"Climate change", cn:"气候变化", cat:"environment" },
+  { en:"Extreme weathers", cn:"极端天气", cat:"environment" },
+  { en:"Disaster", cn:"灾难", cat:"environment" },
+  { en:"flood", cn:"洪水", cat:"environment" },
+  { en:"earthquake", cn:"地震", cat:"environment" },
+  { en:"Drought", cn:"干旱", cat:"environment" },
+  { en:"Ecosystem", cn:"生态系统", cat:"environment" },
+  { en:"Ecological", cn:"生态的", cat:"environment" },
+  { en:"Biodiversity", cn:"生物多样性", cat:"environment" },
+  { en:"Carbon neutrality", cn:"碳中和", cat:"environment" },
+  { en:"Carbon dioxide", cn:"二氧化碳", cat:"environment" },
+  { en:"Greenhouse gas", cn:"温室气体", cat:"environment" },
+  { en:"Greenhouse effect", cn:"温室效应", cat:"environment" },
+  { en:"Greenhouse gas emission", cn:"温室气体排放", cat:"environment" },
+  { en:"Sustainable development", cn:"可持续发展", cat:"environment" },
+  { en:"Emit", cn:"排放", cat:"environment" },
+  { en:"Forest", cn:"森林", cat:"environment" },
+  { en:"Deforestation", cn:"砍伐森林", cat:"environment" },
+  { en:"Reforestation", cn:"植树造林", cat:"environment" },
+  { en:"Recycle", cn:"回收", cat:"environment" },
+
+  // ===== 8. 写作通用类 =====
+  { en:"Proposal", cn:"提案，建议", cat:"writing" },
+  { en:"Submission", cn:"投稿", cat:"writing" },
+  { en:"essay", cn:"论文，短文", cat:"writing" },
+  { en:"Request", cn:"申请", cat:"writing" },
+  { en:"Application", cn:"申请", cat:"writing" },
+  { en:"CV", cn:"简历", cat:"writing", note:"Curriculum Vitae" },
+  { en:"resume", cn:"简历", cat:"writing", note:"美式常用" },
+  { en:"Apply", cn:"应用，申请", cat:"writing", note:"app 应用程序" },
+  { en:"app", cn:"应用程序", cat:"writing" },
+  { en:"Notice", cn:"通知", cat:"writing" },
+  { en:"announcement", cn:"公告", cat:"writing" },
+  { en:"News report", cn:"新闻报告", cat:"writing" },
+  { en:"Introduction", cn:"简介", cat:"writing" },
+  { en:"Summary", cn:"总结", cat:"writing" },
+  { en:"Survey", cn:"调查", cat:"writing" },
+  { en:"Advertisement", cn:"广告", cat:"writing" },
+
+  // ===== 9. 科研实验类 =====
+  // 实验主题
+  { en:"experiment", cn:"实验", cat:"research" },
+  { en:"project", cn:"项目", cat:"research" },
+  { en:"program", cn:"项目", cat:"research" },
+  { en:"vote", cn:"投票", cat:"research" },
+  { en:"survey", cn:"调查", cat:"research" },
+  { en:"study", cn:"调查，研究", cat:"research" },
+  { en:"poll", cn:"投票，公投", cat:"research" },
+  { en:"aim", cn:"目的", cat:"research", note:"同 goal / objective / purpose / intention / target" },
+  { en:"goal", cn:"目标", cat:"research" },
+  { en:"objective", cn:"目的，客观的", cat:"research" },
+  { en:"purpose", cn:"目的", cat:"research" },
+  { en:"intention", cn:"意图", cat:"research" },
+  { en:"target", cn:"目标", cat:"research" },
+  // 实验手段/方法
+  { en:"practice", cn:"措施", cat:"research" },
+  { en:"means", cn:"方法", cat:"research" },
+  { en:"initiative", cn:"举措", cat:"research" },
+  { en:"measure", cn:"方法", cat:"research" },
+  { en:"method", cn:"方法", cat:"research" },
+  { en:"way", cn:"方法", cat:"research" },
+  { en:"illustrate", cn:"证明", cat:"research" },
+  { en:"suggest", cn:"表明", cat:"research" },
+  { en:"indicate", cn:"指出", cat:"research" },
+  { en:"demonstrate", cn:"证明", cat:"research" },
+  { en:"find", cn:"发现", cat:"research" },
+  { en:"reveal", cn:"揭露", cat:"research" },
+  { en:"display", cn:"显示", cat:"research" },
+  { en:"show", cn:"显示", cat:"research" },
+  { en:"turn out", cn:"结果是", cat:"research" },
+  // 参与者/对象
+  { en:"respondent", cn:"受访者", cat:"research" },
+  { en:"participant", cn:"参与者", cat:"research" },
+  { en:"colleague", cn:"同事", cat:"research" },
+  { en:"team", cn:"团队", cat:"research" },
+  // 设施/环境
+  { en:"Faculty", cn:"教员", cat:"research" },
+  { en:"facility", cn:"设施设备", cat:"research" },
+  { en:"Infrastructure", cn:"基础设施", cat:"research" },
+  { en:"Power grid", cn:"电网", cat:"research" },
+  { en:"bridge", cn:"桥梁", cat:"research" },
+];
+
+// ==================== 全局状态 ====================
+const STORAGE_KEY = "cet4_quiz_data_v2";
+
+let state = {
+  mode: "cn2en",
+  category: "all",
+  isSeqMode: false,
+  seqIndex: -1,
+  currentWord: null,
+  errorList: [],           // [{ en, cn, cat, note, count }]
+  totalAnswered: 0,
+  rightAnswered: 0,
+  wrongAnswered: 0,
+  theme: "light",
+  isSubmitting: false,
+  history: [],
+  historyIndex: -1,
+  // 照打状态
+  rewritePhase: false,     // 是否处于"照打正确答案"阶段
+  rewriteCorrectAns: "",   // 需要照打的正确答案
+};
+
+function saveState() {
+  const toSave = {
+    mode: state.mode, category: state.category, isSeqMode: state.isSeqMode,
+    seqIndex: state.seqIndex, errorList: state.errorList,
+    totalAnswered: state.totalAnswered, rightAnswered: state.rightAnswered,
+    wrongAnswered: state.wrongAnswered, theme: state.theme,
+  };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      state.mode = saved.mode || "cn2en";
+      state.category = saved.category || "all";
+      state.isSeqMode = saved.isSeqMode || false;
+      state.seqIndex = saved.seqIndex ?? -1;
+      state.errorList = saved.errorList || [];
+      state.totalAnswered = saved.totalAnswered || 0;
+      state.rightAnswered = saved.rightAnswered || 0;
+      state.wrongAnswered = saved.wrongAnswered || 0;
+      state.theme = saved.theme || "light";
+    }
+  } catch(e) {}
+}
+
+function setTheme(theme) {
+  state.theme = theme;
+  document.documentElement.setAttribute("data-theme", theme);
+  document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+  const map = { light: 0, dark: 1, "eye-care": 2 };
+  document.querySelectorAll(".theme-btn")[map[theme]]?.classList.add("active");
+  saveState();
+}
+
+function getCatName(cat) {
+  const map = {
+    politics:"时政", tech:"科技", culture:"社会文化", campus:"校园",
+    medical:"医疗", economy:"经济", environment:"环保", writing:"写作", research:"科研"
+  };
+  return map[cat] || cat;
+}
+
+function getFilteredList() {
+  if (state.category === "all") return wordList;
+  return wordList.filter(w => w.cat === state.category);
+}
+
+// ==================== 模糊匹配 ====================
+function normalize(str) {
+  return str
+    .replace(/[\uFF01-\uFF5E]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0))
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^[.,!?;:'"\-，。！？；：'""'、]+|[.,!?;:'"\-，。！？；：'""'、]+$/g, "")
+    .toLowerCase();
+}
+
+function isFuzzyMatch(userAns, correctAns) {
+  const u = normalize(userAns);
+  const c = normalize(correctAns);
+  if (u === c) return true;
+
+  // 同义词/简写映射（双向）
+  const pairs = [
+    ["ai","人工智能"], ["人工智能","ai"],
+    ["脱贫，扶贫","脱贫"], ["脱贫，扶贫","扶贫"], ["脱贫","脱贫，扶贫"], ["扶贫","脱贫，扶贫"],
+    ["新能源，可再生能源","新能源"], ["新能源，可再生能源","可再生能源"],
+    ["新能源","新能源，可再生能源"], ["可再生能源","新能源，可再生能源"],
+    ["大语言模型","llm"], ["llm","大语言模型"],
+    ["虚拟现实","vr"], ["vr","虚拟现实"],
+    ["混合现实","mr"], ["mr","混合现实"],
+    ["增强现实","ar"], ["ar","增强现实"],
+    ["物联网","iot"], ["iot","物联网"],
+    ["简历","cv"], ["cv","简历"],
+    ["无人驾驶汽车","driverless car"], ["无人驾驶汽车","self-driving car"],
+    ["无人驾驶汽车","autonomous vehicle"],
+    ["辞职","resign"], ["resign","辞职"],
+    ["传统的","conventional"], ["conventional","传统的"],
+    ["象征","symbolize"], ["symbolize","象征"],
+    ["仪式","ritual"], ["ritual","仪式"],
+    ["大学","university"], ["university","大学"],
+    ["博士学位","phd"], ["phd","博士学位"],
+    ["导师","instructor"], ["instructor","导师"],
+    ["肥胖的","obese"], ["obese","肥胖的"],
+    ["高血压","hypertension"], ["hypertension","高血压"],
+    ["税","taxation"], ["taxation","税"],
+    ["健康","fitness"], ["fitness","健康"],
+    ["药物","medicine"], ["medicine","药物"],
+    ["调查","study"], ["study","调查"],
+    ["申请","request"], ["request","申请"],
+    ["论文，短文","essay"], ["essay","论文，短文"],
+    ["公告","announcement"], ["announcement","公告"],
+  ];
+  for (const [a, b] of pairs) {
+    if (normalize(a) === u && normalize(b) === c) return true;
+    if (normalize(a) === c && normalize(b) === u) return true;
+  }
+  return false;
+}
+
+// ==================== 严格匹配（照打阶段用） ====================
+function isStrictMatch(userAns, correctAns) {
+  return normalize(userAns) === normalize(correctAns);
+}
+
+// ==================== UI 更新 ====================
+function updateStats() {
+  document.getElementById("totalCount").innerText = state.totalAnswered;
+  document.getElementById("rightCount").innerText = state.rightAnswered;
+  document.getElementById("wrongCount").innerText = state.wrongAnswered;
+  const rate = state.totalAnswered > 0
+    ? Math.round((state.rightAnswered / state.totalAnswered) * 100) : 0;
+  document.getElementById("rateText").innerText = rate + "%";
+  document.getElementById("errorCount").innerText = state.errorList.length;
+}
+
+function updateCategoryUI() {
+  document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+  const cats = ["all","politics","tech","culture","campus","medical","economy","environment","writing","research"];
+  const idx = cats.indexOf(state.category);
+  if (idx >= 0) document.querySelectorAll(".cat-btn")[idx]?.classList.add("active");
+}
+
+function updateModeUI() {
+  document.getElementById("modeText").innerText = state.mode === "cn2en" ? "中译英" : "英译中";
+  const seqBtn = document.getElementById("modeSeqBtn");
+  const randBtn = document.getElementById("modeRandBtn");
+  if (state.isSeqMode) {
+    seqBtn.classList.add("active"); seqBtn.style.background = "var(--primary)"; seqBtn.style.color = "#fff";
+    randBtn.classList.remove("active"); randBtn.style.background = ""; randBtn.style.color = "";
+  } else {
+    randBtn.classList.add("active"); randBtn.style.background = "var(--primary)"; randBtn.style.color = "#fff";
+    seqBtn.classList.remove("active"); seqBtn.style.background = ""; seqBtn.style.color = "";
+  }
+}
+
+function updateNavUI() {
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const navInfo = document.getElementById("navInfo");
+  if (state.isSeqMode) {
+    const list = getFilteredList();
+    const total = list.length;
+    prevBtn.disabled = state.seqIndex <= 0;
+    nextBtn.disabled = state.seqIndex >= total - 1 || total === 0;
+    navInfo.innerText = total > 0 ? `${state.seqIndex + 1} / ${total}` : "0 / 0";
+  } else {
+    prevBtn.disabled = state.historyIndex <= 0;
+    nextBtn.disabled = state.historyIndex >= state.history.length - 1;
+    navInfo.innerText = "";
+  }
+}
+
+function renderErrorPanel() {
+  const body = document.getElementById("errorBody");
+  if (state.errorList.length === 0) {
+    body.innerHTML = '<div class="empty-state">暂无错题，继续加油！🎉</div>';
+    return;
+  }
+  body.innerHTML = state.errorList.map((item, i) => `
+    <div class="error-item">
+      <div class="word-pair">
+        <span class="en">${item.en}</span>
+        <span class="cn">${item.cn}</span>
+        ${item.note ? `<span style="font-size:12px;color:var(--text-secondary)">(${item.note})</span>` : ""}
+      </div>
+      <span class="error-count">错${item.count || 1}次</span>
+      <button class="btn btn-warning btn-sm" onclick="redoErrorItem(${i})">重做</button>
+      <button class="btn btn-danger btn-sm" onclick="removeErrorItem(${i})">删除</button>
+    </div>
+  `).join("");
+}
+
+// ==================== 照打正确答案区域 ====================
+function showRewriteArea(correctAns) {
+  state.rewritePhase = true;
+  state.rewriteCorrectAns = correctAns;
+  document.getElementById("answerRow").style.display = "none";
+  document.getElementById("submitBtn").style.display = "none";
+
+  const area = document.getElementById("rewriteArea");
+  area.style.display = "block";
+  area.innerHTML = `
+    <div class="rewrite-box">
+      <div class="rewrite-title">✍️ 请照着打一遍正确答案，加深记忆：</div>
+      <div class="rewrite-target">${correctAns}</div>
+      <div class="rewrite-input-row">
+        <input type="text" id="rewriteInput" placeholder="在此输入上面的正确答案" autocomplete="off">
+        <button class="btn btn-success" id="rewriteConfirmBtn" onclick="confirmRewrite()">确认</button>
+      </div>
+      <div class="rewrite-feedback" id="rewriteFeedback"></div>
+    </div>
+  `;
+
+  // 实时对比输入
+  const ri = document.getElementById("rewriteInput");
+  ri.addEventListener("input", onRewriteInput);
+  ri.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") { e.preventDefault(); confirmRewrite(); }
+  });
+  setTimeout(() => ri.focus(), 100);
+}
+
+function onRewriteInput() {
+  const input = document.getElementById("rewriteInput");
+  const feedback = document.getElementById("rewriteFeedback");
+  if (!input) return;
+
+  if (isStrictMatch(input.value, state.rewriteCorrectAns)) {
+    input.className = "match";
+    feedback.innerHTML = '<span style="color:var(--success)">✅ 完全正确！点击确认或按回车继续</span>';
+  } else if (input.value.length >= state.rewriteCorrectAns.length) {
+    input.className = "mismatch";
+    feedback.innerHTML = '<span style="color:var(--error)">❌ 还没有完全一致，请仔细对照</span>';
+  } else {
+    input.className = "";
+    feedback.innerText = "";
+  }
+}
+
+function confirmRewrite() {
+  if (!state.rewritePhase) return;
+  const input = document.getElementById("rewriteInput");
+  if (!input) return;
+
+  if (!isStrictMatch(input.value, state.rewriteCorrectAns)) {
+    input.className = "mismatch";
+    document.getElementById("rewriteFeedback").innerHTML =
+      '<span style="color:var(--error)">❌ 请确保输入与正确答案完全一致！注意大小写和标点</span>';
+    input.focus();
+    return;
+  }
+
+  // 照打成功，进入下一题
+  hideRewriteArea();
+  goNextQuestion();
+}
+
+function hideRewriteArea() {
+  state.rewritePhase = false;
+  document.getElementById("rewriteArea").style.display = "none";
+  document.getElementById("rewriteArea").innerHTML = "";
+  document.getElementById("answerRow").style.display = "";
+  document.getElementById("submitBtn").style.display = "";
+  state.isSubmitting = false;
+  document.getElementById("submitBtn").disabled = false;
+}
+
+function goNextQuestion() {
+  if (state.isSeqMode) {
+    const list = getFilteredList();
+    if (state.seqIndex < list.length - 1) {
+      nextQuestion();
+    } else {
+      document.getElementById("question").innerText = "🎉 已完成该分类全部题目！";
+      document.getElementById("catTag").style.display = "none";
+    }
+  } else {
+    getQuestion();
+  }
+}
+
+// ==================== 核心逻辑 ====================
+function showQuestion(word) {
+  if (!word) return;
+  state.currentWord = word;
+  const qDom = document.getElementById("question");
+  const catTag = document.getElementById("catTag");
+  const resDom = document.getElementById("resText");
+  const inputDom = document.getElementById("userInput");
+  const quizBox = document.getElementById("quizBox");
+
+  hideRewriteArea();
+  inputDom.value = "";
+  resDom.innerText = "";
+  resDom.className = "result";
+  quizBox.className = "quiz-box";
+  document.getElementById("answerRow").style.display = "";
+  document.getElementById("submitBtn").style.display = "";
+  state.isSubmitting = false;
+  document.getElementById("submitBtn").disabled = false;
+
+  catTag.style.display = "inline-block";
+  catTag.innerText = getCatName(word.cat);
+
+  if (state.mode === "cn2en") {
+    qDom.innerText = "中文：" + word.cn;
+  } else {
+    qDom.innerText = "英文：" + word.en;
+  }
+
+  inputDom.focus();
+  updateNavUI();
+  saveState();
+}
+
+function getQuestion() {
+  const list = getFilteredList();
+  if (list.length === 0) { alert("该分类暂无词汇！"); return; }
+
+  if (state.isSeqMode) {
+    if (state.seqIndex < 0 || state.seqIndex >= list.length) state.seqIndex = 0;
+    state.currentWord = list[state.seqIndex];
+  } else {
+    const idx = Math.floor(Math.random() * list.length);
+    state.currentWord = list[idx];
+    state.seqIndex = list.indexOf(state.currentWord);
+  }
+
+  if (state.historyIndex < state.history.length - 1) {
+    state.history = state.history.slice(0, state.historyIndex + 1);
+  }
+  state.history.push(state.currentWord);
+  state.historyIndex = state.history.length - 1;
+
+  showQuestion(state.currentWord);
+}
+
+function prevQuestion() {
+  if (state.rewritePhase) return;
+  if (state.isSeqMode) {
+    const list = getFilteredList();
+    if (state.seqIndex > 0) { state.seqIndex--; state.currentWord = list[state.seqIndex]; showQuestion(state.currentWord); }
+  } else {
+    if (state.historyIndex > 0) { state.historyIndex--; state.currentWord = state.history[state.historyIndex]; showQuestion(state.currentWord); }
+  }
+}
+
+function nextQuestion() {
+  if (state.rewritePhase) return;
+  if (state.isSeqMode) {
+    const list = getFilteredList();
+    if (state.seqIndex < list.length - 1) { state.seqIndex++; state.currentWord = list[state.seqIndex]; showQuestion(state.currentWord); }
+  } else {
+    if (state.historyIndex < state.history.length - 1) { state.historyIndex++; state.currentWord = state.history[state.historyIndex]; showQuestion(state.currentWord); }
+  }
+}
+
+function checkAnswer() {
+  if (state.isSubmitting) return;
+  if (state.rewritePhase) return;
+  if (!state.currentWord) {
+    document.getElementById("resText").innerText = "请先抽题！";
+    document.getElementById("resText").className = "result show";
+    return;
+  }
+
+  state.isSubmitting = true;
+  document.getElementById("submitBtn").disabled = true;
+
+  const userAns = document.getElementById("userInput").value;
+  const resDom = document.getElementById("resText");
+  const quizBox = document.getElementById("quizBox");
+  let correctAns, isCorrect = false;
+
+  if (state.mode === "cn2en") {
+    correctAns = state.currentWord.en;
+    isCorrect = isFuzzyMatch(userAns, correctAns);
+  } else {
+    correctAns = state.currentWord.cn;
+    isCorrect = isFuzzyMatch(userAns, correctAns);
+  }
+
+  state.totalAnswered++;
+  resDom.className = "result show";
+
+  if (isCorrect) {
+    state.rightAnswered++;
+    resDom.classList.add("right");
+    quizBox.className = "quiz-box correct";
+    const praise = ["🎉 回答正确，太棒啦！", "✅ 完全正确，继续加油！", "👍 记得很牢，真不错！", "💪 很厉害！"];
+    resDom.innerText = praise[Math.floor(Math.random() * praise.length)];
+    if (state.currentWord.note) {
+      resDom.innerHTML += `<div class="paraphrase">💡 释义：${state.currentWord.note}</div>`;
+    }
+
+    // 答对 → 清空输入框 → 自动下一题
+    updateStats();
+    renderErrorPanel();
+    saveState();
+
+    setTimeout(() => {
+      document.getElementById("userInput").value = "";
+      state.isSubmitting = false;
+      document.getElementById("submitBtn").disabled = false;
+      goNextQuestion();
+    }, 1200);
+
+  } else {
+    // 答错 → 显示正确答案 → 进入照打模式
+    state.wrongAnswered++;
+    resDom.classList.add("wrong");
+    quizBox.className = "quiz-box incorrect";
+    let msg = `❌ 答错啦，正确答案是：<strong>${correctAns}</strong>`;
+    if (state.currentWord.note) {
+      msg += `<div class="paraphrase">💡 释义：${state.currentWord.note}</div>`;
+    }
+    resDom.innerHTML = msg;
+
+    // 加入错题本
+    const existIdx = state.errorList.findIndex(
+      e => e.en === state.currentWord.en && e.cn === state.currentWord.cn
+    );
+    if (existIdx >= 0) {
+      state.errorList[existIdx].count = (state.errorList[existIdx].count || 1) + 1;
+    } else {
+      state.errorList.push({ en: state.currentWord.en, cn: state.currentWord.cn, cat: state.currentWord.cat, note: state.currentWord.note || "", count: 1 });
+    }
+
+    updateStats();
+    renderErrorPanel();
+    saveState();
+
+    // 清空输入框，显示照打区域
+    document.getElementById("userInput").value = "";
+    setTimeout(() => {
+      showRewriteArea(correctAns);
+    }, 600);
+  }
+}
+
+// ==================== 事件 ====================
+document.getElementById("userInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter" && !state.rewritePhase) {
+    e.preventDefault();
+    checkAnswer();
+  }
+});
+
+// ==================== 分类 & 模式切换 ====================
+function setCategory(cat) {
+  state.category = cat;
+  state.seqIndex = -1;
+  state.history = [];
+  state.historyIndex = -1;
+  hideRewriteArea();
+  updateCategoryUI();
+  updateNavUI();
+  document.getElementById("question").innerText = "分类已切换，请抽题开始答题";
+  document.getElementById("resText").innerText = "";
+  document.getElementById("resText").className = "result";
+  document.getElementById("quizBox").className = "quiz-box";
+  document.getElementById("catTag").style.display = "none";
+  document.getElementById("userInput").value = "";
+  saveState();
+}
+
+function switchMode(mode) {
+  state.mode = mode;
+  hideRewriteArea();
+  updateModeUI();
+  document.getElementById("question").innerText = "模式已切换，请抽题开始答题";
+  document.getElementById("resText").innerText = "";
+  document.getElementById("resText").className = "result";
+  document.getElementById("quizBox").className = "quiz-box";
+  document.getElementById("userInput").value = "";
+  saveState();
+}
+
+function toggleSeqMode() {
+  state.isSeqMode = !state.isSeqMode;
+  state.seqIndex = -1;
+  state.history = [];
+  state.historyIndex = -1;
+  hideRewriteArea();
+  updateModeUI();
+  updateNavUI();
+  document.getElementById("question").innerText = state.isSeqMode ? "已切换为顺序刷题，请抽题" : "已切换为随机刷题，请抽题";
+  document.getElementById("resText").innerText = "";
+  document.getElementById("resText").className = "result";
+  document.getElementById("quizBox").className = "quiz-box";
+  document.getElementById("catTag").style.display = "none";
+  saveState();
+}
+
+// ==================== 错题本 ====================
+function redoError() {
+  if (state.errorList.length === 0) {
+    document.getElementById("resText").innerText = "暂无错题！";
+    document.getElementById("resText").className = "result show";
+    return;
+  }
+  const idx = Math.floor(Math.random() * state.errorList.length);
+  state.currentWord = state.errorList[idx];
+  state.history.push(state.currentWord);
+  state.historyIndex = state.history.length - 1;
+  showQuestion(state.currentWord);
+  document.getElementById("question").innerText =
+    "【错题重做】" + (state.mode === "cn2en" ? "中文：" + state.currentWord.cn : "英文：" + state.currentWord.en);
+}
+
+function redoErrorItem(index) {
+  state.currentWord = state.errorList[index];
+  state.history.push(state.currentWord);
+  state.historyIndex = state.history.length - 1;
+  showQuestion(state.currentWord);
+  document.getElementById("question").innerText =
+    "【错题重做】" + (state.mode === "cn2en" ? "中文：" + state.currentWord.cn : "英文：" + state.currentWord.en);
+}
+
+function removeErrorItem(index) {
+  state.errorList.splice(index, 1);
+  renderErrorPanel();
+  document.getElementById("errorCount").innerText = state.errorList.length;
+  saveState();
+}
+
+function clearErrors() {
+  state.errorList = [];
+  document.getElementById("errorCount").innerText = "0";
+  renderErrorPanel();
+  document.getElementById("resText").innerText = "错题本已清空！";
+  document.getElementById("resText").className = "result show";
+  saveState();
+}
+
+function toggleErrorPanel() {
+  document.getElementById("errorPanel").classList.toggle("open");
+}
+
+function init() {
+  loadState();
+  setTheme(state.theme);
+  updateStats();
+  updateCategoryUI();
+  updateModeUI();
+  updateNavUI();
+  renderErrorPanel();
+}
+init();
+</script>
+</body>
+</html>
