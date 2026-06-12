@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="CET4">
 <link rel="manifest" href="manifest.json">
-<title>四级高频词自测 | 分类刷题 + 错题本</title>
+<title>四级高频词自测 | 分类刷题 + 错题本 + 智能复习</title>
 <style>
 :root {
   --bg: #f4f6f9;
@@ -390,6 +390,7 @@ kbd { padding: 2px 6px; background: var(--hover-bg); border: 1px solid var(--bor
       <button class="btn btn-outline btn-sm" id="nextBtn" onclick="nextQuestion()" disabled>下一题 ▶</button>
       <span style="flex:1"></span>
       <button class="btn btn-primary btn-sm" onclick="getQuestion()">随机抽题</button>
+      <button class="btn btn-success btn-sm" id="reviewModeBtn" onclick="toggleReviewMode()">🧠 智能复习</button>
       <button class="btn btn-warning btn-sm" onclick="redoError()">重做错题</button>
       <button class="btn btn-danger btn-sm" onclick="clearErrors()">清空错题本</button>
     </div>
@@ -402,6 +403,8 @@ kbd { padding: 2px 6px; background: var(--hover-bg); border: 1px solid var(--bor
     </div>
     <div class="error-panel-body" id="errorBody"></div>
   </div>
+
+  <div class="error-panel" id="reviewPanel" style="display:none;"></div>
 
   <div class="favorite-panel" id="favoritePanel">
     <div class="favorite-panel-header" onclick="toggleFavoritePanel()">
@@ -449,6 +452,7 @@ kbd { padding: 2px 6px; background: var(--hover-bg); border: 1px solid var(--bor
       <span><kbd>Space</kbd> 随机抽题</span>
       <span><kbd>S</kbd> 发音</span>
       <span><kbd>F</kbd> 收藏</span>
+      <span><kbd>R</kbd> 复习进度</span>
     </div>
   </div>
   </div>
@@ -798,7 +802,176 @@ let state = {
   todayDate: "",
   // 显示例句
   showExample: false,
+  // 答题计时
+  answerStartTime: 0,
+  // SM-2间隔重复数据：{ [wordKey]: { repetition, interval, efactor, nextReview, lastReview } }
+  sm2Data: {},
+  // 智能复习模式
+  reviewMode: false,
 };
+
+// ==================== SM-2 间隔重复算法 ====================
+function sm2(wordKey, quality) {
+  if (quality < 0) quality = 0;
+  if (quality > 5) quality = 5;
+  let data = state.sm2Data[wordKey];
+  if (!data) {
+    data = { repetition: 0, interval: 0, efactor: 2.5, nextReview: Date.now(), lastReview: null };
+  }
+  if (quality >= 3) {
+    if (data.repetition === 0) data.interval = 1;
+    else if (data.repetition === 1) data.interval = 6;
+    else data.interval = Math.round(data.interval * data.efactor);
+    data.repetition++;
+  } else {
+    data.repetition = 0;
+    data.interval = 1;
+  }
+  data.efactor = data.efactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+  if (data.efactor < 1.3) data.efactor = 1.3;
+  data.lastReview = Date.now();
+  data.nextReview = Date.now() + data.interval * 24 * 60 * 60 * 1000;
+  state.sm2Data[wordKey] = data;
+  saveState();
+  return data;
+}
+
+function getSm2Data(wordKey) {
+  return state.sm2Data[wordKey] || null;
+}
+
+function getWordKey(word) {
+  return word.en + '|' + word.cn;
+}
+
+function needsReview(word) {
+  const data = getSm2Data(getWordKey(word));
+  if (!data) return true;
+  return Date.now() >= data.nextReview;
+}
+
+function getMasteryLevel(word) {
+  const data = getSm2Data(getWordKey(word));
+  if (!data) return 0;
+  if (data.repetition >= 5) return 5;
+  return data.repetition;
+}
+
+function getReviewProgress() {
+  const list = getFilteredList();
+  const total = list.length;
+  const reviewed = list.filter(w => !needsReview(w)).length;
+  return { total, reviewed, percentage: total > 0 ? Math.round((reviewed / total) * 100) : 0 };
+}
+
+function getReviewList() {
+  const list = getFilteredList();
+  return list.filter(w => needsReview(w));
+}
+
+function getSmartQuestion() {
+  if (!state.reviewMode) {
+    getQuestion();
+    return;
+  }
+  const reviewList = getReviewList();
+  if (reviewList.length > 0) {
+    const idx = Math.floor(Math.random() * reviewList.length);
+    state.currentWord = reviewList[idx];
+  } else {
+    const list = getFilteredList();
+    if (list.length === 0) { alert("该分类暂无词汇！"); return; }
+    const idx = Math.floor(Math.random() * list.length);
+    state.currentWord = list[idx];
+  }
+  if (state.historyIndex < state.history.length - 1) {
+    state.history = state.history.slice(0, state.historyIndex + 1);
+  }
+  state.history.push(state.currentWord);
+  state.historyIndex = state.history.length - 1;
+  showQuestion(state.currentWord);
+}
+
+function toggleReviewMode() {
+  state.reviewMode = !state.reviewMode;
+  updateReviewModeUI();
+  saveState();
+  const resDom = document.getElementById("resText");
+  if (state.reviewMode) {
+    const reviewList = getReviewList();
+    resDom.innerText = "已开启智能复习，待复习 " + reviewList.length + " 个单词";
+  } else {
+    resDom.innerText = "已关闭智能复习，恢复随机抽题";
+  }
+  resDom.className = "result show";
+  setTimeout(() => { resDom.className = "result"; }, 2000);
+}
+
+function updateReviewModeUI() {
+  const btn = document.getElementById("reviewModeBtn");
+  if (!btn) return;
+  if (state.reviewMode) {
+    btn.classList.add("active");
+    btn.style.background = "var(--success)";
+    btn.style.color = "#fff";
+  } else {
+    btn.classList.remove("active");
+    btn.style.background = "";
+    btn.style.color = "";
+  }
+}
+
+function getMasteryTag(word) {
+  const level = getMasteryLevel(word);
+  const tags = ["🆕 新词", "⭐ 初学", "⭐⭐ 熟悉", "⭐⭐⭐ 掌握", "⭐⭐⭐⭐ 熟练", "🌟 精通"];
+  return tags[level] || tags[0];
+}
+
+function getNextReviewText(word) {
+  const data = getSm2Data(getWordKey(word));
+  if (!data) return "未学习";
+  const diff = data.nextReview - Date.now();
+  if (diff <= 0) return "现在复习";
+  const days = Math.ceil(diff / (24 * 60 * 60 * 1000));
+  if (days === 1) return "明天复习";
+  return days + "天后复习";
+}
+
+function showReviewPanel() {
+  const list = getFilteredList();
+  let html = '<div style="padding:14px 18px;">';
+  html += '<h2 style="font-size:16px;margin:0 0 12px;">📊 复习进度</h2>';
+  const progress = getReviewProgress();
+  html += '<div style="margin-bottom:12px;font-size:14px;color:var(--text-secondary);">';
+  html += '已掌握 ' + progress.reviewed + '/' + progress.total + ' (' + progress.percentage + '%)';
+  html += '</div>';
+  html += '<div style="height:8px;background:var(--hover-bg);border-radius:4px;margin-bottom:12px;overflow:hidden;">';
+  html += '<div style="height:100%;background:var(--success);border-radius:4px;width:' + progress.percentage + '%;transition:width .3s ease;"></div>';
+  html += '</div>';
+  const reviewList = getReviewList();
+  if (reviewList.length > 0) {
+    html += '<div style="font-size:14px;color:var(--text-secondary);margin-bottom:8px;">📝 待复习：' + reviewList.length + '个单词</div>';
+    html += '<div style="max-height:200px;overflow-y:auto;">';
+    reviewList.slice(0, 20).forEach(w => {
+      const mastery = getMasteryTag(w);
+      const next = getNextReviewText(w);
+      html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;">';
+      html += '<span><span style="color:var(--primary);font-weight:500;">' + w.en + '</span> <span style="color:var(--text-secondary);">' + w.cn + '</span></span>';
+      html += '<span style="white-space:nowrap;">' + mastery + ' · ' + next + '</span>';
+      html += '</div>';
+    });
+    if (reviewList.length > 20) html += '<div style="padding:8px 0;font-size:12px;color:var(--text-secondary);text-align:center;">...还有' + (reviewList.length - 20) + '个单词</div>';
+    html += '</div>';
+  } else {
+    html += '<div style="font-size:14px;color:var(--success);">🎉 所有单词都已复习！</div>';
+  }
+  html += '</div>';
+  const panel = document.getElementById("reviewPanel");
+  if (panel) {
+    panel.innerHTML = html;
+    panel.style.display = "block";
+  }
+}
 
 function saveState() {
   const toSave = {
@@ -808,6 +981,7 @@ function saveState() {
     rightAnswered: state.rightAnswered, wrongAnswered: state.wrongAnswered,
     theme: state.theme, dailyGoal: state.dailyGoal, todayAnswered: state.todayAnswered,
     todayCorrect: state.todayCorrect, todayDate: state.todayDate,
+    sm2Data: state.sm2Data, reviewMode: state.reviewMode,
   };
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); } catch(e) {}
 }
@@ -832,6 +1006,8 @@ function loadState() {
       state.todayAnswered = saved.todayAnswered || 0;
       state.todayCorrect = saved.todayCorrect || 0;
       state.todayDate = saved.todayDate || "";
+      state.sm2Data = saved.sm2Data || {};
+      state.reviewMode = saved.reviewMode || false;
     }
   } catch(e) {}
 }
@@ -954,6 +1130,12 @@ function isFuzzyMatch(userAns, correctAns) {
     if (normalize(a) === c && normalize(b) === u) return true;
   }
   return false;
+}
+
+// ==================== 同义词自动查找 ====================
+function getAlternatives(word) {
+  const sameCn = wordList.filter(w => w.cn === word.cn && w.en !== word.en);
+  return sameCn.map(w => w.en);
 }
 
 // ==================== 严格匹配（照打阶段用） ====================
@@ -1273,6 +1455,7 @@ function goNextQuestion() {
 function showQuestion(word) {
   if (!word) return;
   state.currentWord = word;
+  state.answerStartTime = Date.now();
   const qDom = document.getElementById("question");
   const catTag = document.getElementById("catTag");
   const diffTag = document.getElementById("diffTag");
@@ -1319,6 +1502,7 @@ function showQuestion(word) {
 }
 
 function getQuestion() {
+  if (state.reviewMode) { getSmartQuestion(); return; }
   const list = getFilteredList();
   if (list.length === 0) { alert("该分类暂无词汇！"); return; }
 
@@ -1380,6 +1564,10 @@ function checkAnswer() {
   if (state.mode === "cn2en") {
     correctAns = state.currentWord.en;
     isCorrect = isFuzzyMatch(userAns, correctAns);
+    if (!isCorrect) {
+      const alternatives = getAlternatives(state.currentWord);
+      isCorrect = alternatives.some(alt => isFuzzyMatch(userAns, alt));
+    }
   } else {
     correctAns = state.currentWord.cn;
     isCorrect = isFuzzyMatch(userAns, correctAns);
@@ -1387,6 +1575,7 @@ function checkAnswer() {
 
   state.totalAnswered++;
   state.todayAnswered++;
+  const timeSpent = Date.now() - state.answerStartTime;
   resDom.className = "result show";
 
   if (isCorrect) {
@@ -1400,8 +1589,24 @@ function checkAnswer() {
     if (state.currentWord.note) {
       resDom.innerHTML += `<div class="paraphrase">💡 释义：${state.currentWord.note}</div>`;
     }
+    if (state.mode === "cn2en") {
+      const alternatives = getAlternatives(state.currentWord);
+      if (alternatives.length > 0) {
+        resDom.innerHTML += `<div class="paraphrase">💡 也可接受：${alternatives.join(', ')}</div>`;
+      }
+    }
 
-    // 答对 → 清空输入框 → 自动下一题
+    // SM-2: 答对，根据回忆速度评分 (3-5)
+    let quality = timeSpent < 2000 ? 5 : timeSpent < 5000 ? 4 : 3;
+    const wordKey = getWordKey(state.currentWord);
+    const beforeData = getSm2Data(wordKey);
+    const beforeRep = beforeData ? beforeData.repetition : 0;
+    sm2(wordKey, quality);
+    const afterData = getSm2Data(wordKey);
+    if (afterData && afterData.repetition > beforeRep && afterData.repetition <= 5) {
+      resDom.innerHTML += `<div class="paraphrase">📈 连续正确 ${afterData.repetition} 次，间隔 ${afterData.interval} 天</div>`;
+    }
+
     updateStats();
     renderErrorPanel();
     saveState();
@@ -1414,7 +1619,6 @@ function checkAnswer() {
     }, 1200);
 
   } else {
-    // 答错 → 显示正确答案 → 进入照打模式
     state.wrongAnswered++;
     resDom.classList.add("wrong");
     quizBox.className = "quiz-box incorrect";
@@ -1423,7 +1627,18 @@ function checkAnswer() {
     if (state.currentWord.note) {
       msg += `<div class="paraphrase">💡 释义：${state.currentWord.note}</div>`;
     }
+    if (state.mode === "cn2en") {
+      const alternatives = getAlternatives(state.currentWord);
+      if (alternatives.length > 0) {
+        msg += `<div class="paraphrase">💡 也可接受：${alternatives.join(', ')}</div>`;
+      }
+    }
     resDom.innerHTML = msg;
+
+    // SM-2: 答错，重置间隔
+    const wordKey = getWordKey(state.currentWord);
+    sm2(wordKey, 0);
+    resDom.innerHTML += `<div class="paraphrase">🔄 已重置复习间隔，1天后复习</div>`;
 
     // 加入错题本
     const existIdx = state.errorList.findIndex(
@@ -1497,6 +1712,18 @@ document.addEventListener("keydown", function(e) {
       // 收藏
       if (!state.rewritePhase && document.activeElement.tagName !== "INPUT") {
         toggleFavorite();
+      }
+      break;
+    case "r":
+    case "R":
+      // 复习进度
+      if (!state.rewritePhase && document.activeElement.tagName !== "INPUT") {
+        const rp = document.getElementById("reviewPanel");
+        if (rp.style.display === "none" || !rp.style.display) {
+          showReviewPanel();
+        } else {
+          rp.style.display = "none";
+        }
       }
       break;
   }
@@ -1732,6 +1959,7 @@ function init() {
   updateNavUI();
   renderErrorPanel();
   renderFavoritePanel();
+  updateReviewModeUI();
   
   // 检查每日日期，重置今日统计
   const today = new Date().toDateString();
