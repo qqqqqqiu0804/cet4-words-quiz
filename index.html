@@ -324,6 +324,62 @@ kbd { padding: 2px 6px; background: var(--hover-bg); border: 1px solid var(--bor
   .goal-stats { flex-direction: column; gap: 4px; }
   .tools-grid { grid-template-columns: 1fr; }
 }
+
+/* 版本号悬浮球 */
+.version-badge {
+  position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--primary); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 2px 12px rgba(64,158,255,0.4);
+  transition: transform .25s ease, box-shadow .25s ease;
+  user-select: none;
+}
+.version-badge:hover { transform: scale(1.1); box-shadow: 0 4px 20px rgba(64,158,255,0.6); }
+
+.version-popup {
+  position: fixed; bottom: 74px; right: 20px; z-index: 9999;
+  width: 320px; max-height: 420px; overflow-y: auto;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+  padding: 0; display: none;
+  animation: fadeInUp .3s ease;
+}
+.version-popup.show { display: block; }
+.version-popup-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--card); z-index: 1;
+}
+.version-popup-header h3 { margin: 0; font-size: 15px; color: var(--text); }
+.version-popup-close {
+  background: none; border: none; font-size: 18px; cursor: pointer;
+  color: var(--text-secondary); padding: 0 4px;
+}
+.version-list { padding: 8px 16px 14px; }
+.version-item { margin-bottom: 14px; }
+.version-item:last-child { margin-bottom: 0; }
+.version-item-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+}
+.version-tag {
+  font-size: 13px; font-weight: 700; color: var(--primary);
+  background: var(--tag-bg); padding: 2px 10px; border-radius: 10px;
+}
+.version-date { font-size: 12px; color: var(--text-secondary); }
+.version-item ul {
+  margin: 0; padding-left: 18px; font-size: 13px;
+  color: var(--text-secondary); line-height: 1.7;
+}
+.version-item li { margin-bottom: 2px; }
+.version-item .tag-new { color: var(--success); font-weight: 600; }
+.version-item .tag-fix { color: var(--warning); font-weight: 600; }
+.version-item .tag-improve { color: var(--primary); font-weight: 600; }
+
+@media (max-width: 600px) {
+  .version-popup { width: calc(100vw - 32px); right: 16px; bottom: 70px; }
+}
 </style>
 </head>
 <body>
@@ -2064,6 +2120,60 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+</script>
+
+<!-- 版本号悬浮球 -->
+<div class="version-badge" id="versionBadge" onclick="toggleVersionPopup()">v2.0</div>
+<div class="version-popup" id="versionPopup">
+  <div class="version-popup-header">
+    <h3>📋 更新日志</h3>
+    <button class="version-popup-close" onclick="toggleVersionPopup()">&times;</button>
+  </div>
+  <div class="version-list">
+    <div class="version-item">
+      <div class="version-item-header">
+        <span class="version-tag">v2.0</span>
+        <span class="version-date">2026-06-12</span>
+      </div>
+      <ul>
+        <li><span class="tag-new">[新功能]</span> SM-2 间隔重复算法，智能安排复习时间</li>
+        <li><span class="tag-new">[新功能]</span> 智能复习模式，优先抽取到期单词</li>
+        <li><span class="tag-new">[新功能]</span> 复习进度面板，查看掌握程度</li>
+        <li><span class="tag-new">[新功能]</span> 单词掌握程度标签（新词→精通）</li>
+        <li><span class="tag-new">[新功能]</span> 答题即时反馈复习间隔信息</li>
+        <li><span class="tag-improve">[优化]</span> 按 R 键快速查看复习进度</li>
+      </ul>
+    </div>
+    <div class="version-item">
+      <div class="version-item-header">
+        <span class="version-tag">v1.0</span>
+        <span class="version-date">2026-06-01</span>
+      </div>
+      <ul>
+        <li><span class="tag-new">[新功能]</span> 四级高频词分类刷题（9大分类）</li>
+        <li><span class="tag-new">[新功能]</span> 中译英 / 英译中双模式</li>
+        <li><span class="tag-new">[新功能]</span> 错题本 + 收藏夹</li>
+        <li><span class="tag-new">[新功能]</span> 顺序 / 随机刷题 + 难度筛选</li>
+        <li><span class="tag-new">[新功能]</span> 今日目标 + 每日统计</li>
+        <li><span class="tag-new">[新功能]</span> 导入导出错题本和收藏</li>
+        <li><span class="tag-new">[新功能]</span> 日间 / 夜间 / 护眼主题</li>
+        <li><span class="tag-new">[新功能]</span> 答错照打 + 音效反馈</li>
+        <li><span class="tag-new">[新功能]</span> 键盘快捷键支持</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+function toggleVersionPopup() {
+  document.getElementById("versionPopup").classList.toggle("show");
+}
+document.addEventListener("click", function(e) {
+  const popup = document.getElementById("versionPopup");
+  const badge = document.getElementById("versionBadge");
+  if (!popup.contains(e.target) && e.target !== badge) {
+    popup.classList.remove("show");
+  }
+});
 </script>
 </body>
 </html>
