@@ -2060,8 +2060,9 @@ function toggleErrorPanel() {
 
 function setFontSize(size) {
   state.fontSize = size;
-  const sizes = { small: '14px', medium: '16px', large: '18px' };
-  document.body.style.fontSize = sizes[size] || sizes.medium;
+  const scales = { small: 0.88, medium: 1, large: 1.15 };
+  const container = document.querySelector('.container');
+  container.style.zoom = scales[size] || 1;
   document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
   const idx = { small: 0, medium: 1, large: 2 }[size];
   document.querySelectorAll('.font-btn')[idx]?.classList.add('active');
