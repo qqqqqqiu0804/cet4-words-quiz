@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#409eff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CET4">
+<link rel="manifest" href="manifest.json">
+<title>四级高频词自测 | 分类刷题 + 错题本 + 智能复习</title>
+<style>
+:root {
+  --bg: #f4f6f9;
+  --card: #fff;
+  --text: #2c3e50;
+  --text-secondary: #64748b;
+  --border: #e5e7eb;
+  --primary: #409eff;
+  --primary-hover: #337ecc;
+  --success: #67c23a;
+  --error: #f56c6c;
+  --warning: #e6a23c;
+  --input-bg: #fff;
+  --tag-bg: #ecf5ff;
+  --tag-text: #409eff;
+  --shadow: 0 2px 15px rgba(0,0,0,0.1);
+  --radius: 8px;
+  --transition: .25s ease;
+  --disabled-bg: #c0c4cc;
+  --hover-bg: #f0f2f5;
+  --wrong-bg: #fef0f0;
+  --right-bg: #f0f9eb;
+  --rewrite-bg: #fff8e1;
+  --rewrite-border: #ffc107;
+}
+[data-theme="dark"] {
+  --bg: #1a1a2e;
+  --card: #16213e;
+  --text: #e0e0e0;
+  --text-secondary: #a0aec0;
+  --border: #2d3748;
+  --primary: #667eea;
+  --primary-hover: #5a6fd6;
+  --input-bg: #2d3748;
+  --tag-bg: #2d3748;
+  --tag-text: #a5b4fc;
+  --shadow: 0 2px 15px rgba(0,0,0,0.4);
+  --disabled-bg: #4a5568;
+  --hover-bg: #2d3748;
+  --wrong-bg: #3b1c1c;
+  --right-bg: #1c3b1c;
+  --rewrite-bg: #3d3520;
+  --rewrite-border: #ffc107;
+}
+[data-theme="eye-care"] {
+  --bg: #f4ecd8;
+  --card: #faf6eb;
+  --text: #4a3728;
+  --text-secondary: #7a6b5c;
+  --border: #d4c5a9;
+  --primary: #6b9b5a;
+  --primary-hover: #5a8a4a;
+  --input-bg: #fef9ee;
+  --tag-bg: #e8f5e0;
+  --tag-text: #4a7c3f;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --disabled-bg: #c8c0a8;
+  --hover-bg: #f5f0e0;
+  --wrong-bg: #fce8e6;
+  --right-bg: #e6f4e0;
+  --rewrite-bg: #fef5e0;
+  --rewrite-border: #d4a017;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 16px;
+  transition: background var(--transition), color var(--transition);
+  min-height: 100vh;
+}
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  background: var(--card);
+  padding: 28px 24px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; margin-bottom: 20px; padding-bottom: 14px;
+  border-bottom: 2px solid var(--primary);
+}
+.header h1 { font-size: 22px; color: var(--text); }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.theme-btn {
+  padding: 6px 12px; font-size: 13px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--text); cursor: pointer; transition: all var(--transition);
+}
+.theme-btn:hover { border-color: var(--primary); color: var(--primary); }
+.theme-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.stats-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.stat-card {
+  flex: 1; min-width: 90px; text-align: center; padding: 12px 8px;
+  background: var(--hover-bg); border-radius: var(--radius);
+  transition: background var(--transition);
+}
+.stat-card .num { font-size: 24px; font-weight: 700; }
+.stat-card .label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.stat-card.total .num { color: var(--primary); }
+.stat-card.right .num { color: var(--success); }
+.stat-card.wrong .num { color: var(--error); }
+.stat-card.rate .num { color: var(--warning); }
+
+.cat-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+.cat-bar > span { font-size: 13px; color: var(--text-secondary); margin-right: 4px; white-space: nowrap; }
+.cat-btn {
+  padding: 5px 14px; font-size: 13px; border: 1px solid var(--border);
+  border-radius: 20px; background: var(--card); color: var(--text-secondary);
+  cursor: pointer; transition: all var(--transition); white-space: nowrap;
+}
+.cat-btn:hover { border-color: var(--primary); color: var(--primary); }
+.cat-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.tool-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+.mode-label { font-size: 13px; color: var(--text-secondary); margin-right: 4px; white-space: nowrap; }
+
+.btn {
+  padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer;
+  font-size: 14px; transition: all var(--transition); white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.btn:disabled { background: var(--disabled-bg) !important; cursor: not-allowed; opacity: 0.65; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+.btn-warning { background: var(--warning); color: #fff; }
+.btn-warning:hover:not(:disabled) { background: #d49028; }
+.btn-danger { background: var(--error); color: #fff; }
+.btn-danger:hover:not(:disabled) { background: #e45757; }
+.btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+.btn-outline:hover:not(:disabled) { background: var(--primary); color: #fff; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover:not(:disabled) { background: #5daf34; }
+
+.quiz-box {
+  margin: 16px 0; padding: 24px; border: 2px solid var(--border);
+  border-radius: var(--radius); background: var(--card);
+  transition: all var(--transition); position: relative;
+}
+.quiz-box.correct { border-color: var(--success); background: var(--right-bg); }
+.quiz-box.incorrect { border-color: var(--error); background: var(--wrong-bg); }
+
+/* 答错后照打区域 */
+.rewrite-box {
+  margin-top: 16px; padding: 18px; border: 2px dashed var(--rewrite-border);
+  border-radius: var(--radius); background: var(--rewrite-bg);
+  animation: fadeInUp .35s ease;
+}
+.rewrite-box .rewrite-title {
+  font-size: 15px; font-weight: 600; color: var(--warning); margin-bottom: 8px;
+}
+.rewrite-box .rewrite-target {
+  font-size: 20px; font-weight: 700; color: var(--primary);
+  margin-bottom: 10px; letter-spacing: 1px;
+}
+.rewrite-box .rewrite-input-row {
+  display: flex; gap: 10px;
+}
+.rewrite-box .rewrite-input-row input {
+  flex: 1; padding: 10px 14px; font-size: 16px; border: 2px solid var(--border);
+  border-radius: var(--radius); background: var(--input-bg); color: var(--text);
+  outline: none; transition: border var(--transition); min-width: 0;
+}
+.rewrite-box .rewrite-input-row input:focus { border-color: var(--primary); }
+.rewrite-box .rewrite-input-row input.match { border-color: var(--success); background: var(--right-bg); }
+.rewrite-box .rewrite-input-row input.mismatch { border-color: var(--error); background: var(--wrong-bg); }
+.rewrite-feedback { font-size: 14px; margin-top: 8px; min-height: 20px; }
+
+.cat-tag {
+  display: inline-block; font-size: 12px; padding: 2px 10px;
+  border-radius: 12px; background: var(--tag-bg); color: var(--tag-text); margin-bottom: 12px;
+}
+
+.q-text {
+  font-size: 20px; margin: 12px 0; color: var(--text);
+  min-height: 30px; line-height: 1.6; word-break: break-word;
+}
+
+.input-row { display: flex; gap: 10px; margin: 12px 0; }
+.input-row input {
+  flex: 1; padding: 10px 14px; font-size: 16px; border: 2px solid var(--border);
+  border-radius: var(--radius); background: var(--input-bg); color: var(--text);
+  outline: none; transition: border var(--transition); min-width: 0;
+}
+.input-row input:focus { border-color: var(--primary); }
+
+.result {
+  margin-top: 12px; font-size: 16px; font-weight: 500;
+  min-height: 24px; opacity: 0; transition: opacity .3s ease;
+}
+.result.show { opacity: 1; }
+.result.right { color: var(--success); }
+.result.wrong { color: var(--error); }
+.result .paraphrase { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+.nav-bar { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+.nav-bar .nav-info { font-size: 13px; color: var(--text-secondary); margin: 0 8px; }
+
+.error-panel {
+  margin-top: 20px; border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; transition: all var(--transition);
+}
+.error-panel-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; background: var(--hover-bg); cursor: pointer;
+  user-select: none; transition: background var(--transition);
+}
+.error-panel-header:hover { opacity: 0.9; }
+.error-panel-header h2 { font-size: 16px; color: var(--text); }
+.error-panel-header .arrow { transition: transform var(--transition); font-size: 12px; }
+.error-panel.open .error-panel-header .arrow { transform: rotate(180deg); }
+.error-panel-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+.error-panel.open .error-panel-body { max-height: 600px; overflow-y: auto; }
+
+.error-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 18px; border-bottom: 1px solid var(--border);
+  font-size: 14px; gap: 8px; flex-wrap: wrap;
+}
+.error-item:last-child { border-bottom: none; }
+.error-item .word-pair { flex: 1; min-width: 0; }
+.error-item .word-pair .en { color: var(--primary); font-weight: 500; }
+.error-item .word-pair .cn { color: var(--text-secondary); margin-left: 8px; }
+.error-item .error-count { font-size: 12px; color: var(--error); white-space: nowrap; }
+
+.empty-state { text-align: center; padding: 32px 16px; color: var(--text-secondary); font-size: 14px; }
+
+@media (max-width: 600px) {
+  .container { padding: 16px 12px; }
+  .header h1 { font-size: 18px; }
+  .quiz-box { padding: 16px; }
+  .q-text { font-size: 17px; }
+  .input-row, .rewrite-box .rewrite-input-row { flex-direction: column; }
+  .input-row .btn, .rewrite-box .rewrite-input-row .btn { width: 100%; }
+  .stat-card .num { font-size: 20px; }
+  .btn { padding: 8px 12px; font-size: 13px; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.quiz-box { animation: fadeInUp .35s ease; }
+.rewrite-box { animation: fadeInUp .35s ease; }
+
+/* 新增样式 */
+.quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.quiz-actions { display: flex; gap: 6px; }
+.difficulty-tag { display: inline-block; font-size: 12px; padding: 2px 10px; border-radius: 12px; background: #fff8e1; color: #ffc107; }
+.example-text { font-size: 14px; color: var(--text-secondary); margin: 8px 0; padding: 10px; background: var(--hover-bg); border-radius: var(--radius); font-style: italic; }
+
+.favorite-panel, .daily-goal-panel, .tools-panel, .keyboard-help {
+  margin-top: 20px; border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; transition: all var(--transition); background: var(--card);
+}
+.favorite-panel-header, .daily-goal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; background: var(--hover-bg); cursor: pointer; user-select: none;
+}
+.favorite-panel-header h2, .daily-goal-header h2 { font-size: 16px; color: var(--text); margin: 0; }
+.favorite-panel-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+.favorite-panel.open .favorite-panel-body { max-height: 600px; overflow-y: auto; }
+.favorite-panel.open .favorite-panel-header .arrow { transform: rotate(180deg); }
+
+.goal-progress { font-size: 14px; color: var(--text-secondary); }
+.goal-progress input { width: 60px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; text-align: center; }
+.goal-bar { height: 8px; background: var(--hover-bg); border-radius: 4px; margin: 12px 18px; overflow: hidden; }
+.goal-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width .3s ease; }
+.goal-stats { display: flex; gap: 16px; padding: 0 18px 14px; font-size: 13px; color: var(--text-secondary); }
+
+.tools-panel { padding: 14px 18px; }
+.tools-panel h2 { font-size: 16px; margin: 0 0 12px; }
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+
+.keyboard-help { padding: 14px 18px; }
+.keyboard-help h3 { font-size: 14px; margin: 0 0 10px; color: var(--text-secondary); }
+.shortcut-list { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--text-secondary); }
+kbd { padding: 2px 6px; background: var(--hover-bg); border: 1px solid var(--border); border-radius: 4px; font-family: monospace; font-size: 11px; }
+
+.favorite-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 18px; border-bottom: 1px solid var(--border); font-size: 14px;
+}
+.favorite-item:last-child { border-bottom: none; }
+.favorite-item .word-pair { flex: 1; min-width: 0; }
+.favorite-item .word-pair .en { color: var(--primary); font-weight: 500; }
+.favorite-item .word-pair .cn { color: var(--text-secondary); margin-left: 8px; }
+
+#favBtn.active { background: #ffc107; color: #fff; border-color: #ffc107; }
+
+@media (max-width: 600px) {
+  .quiz-header { flex-direction: column; gap: 8px; align-items: flex-start; }
+  .quiz-actions { width: 100%; justify-content: flex-end; }
+  .goal-stats { flex-direction: column; gap: 4px; }
+  .tools-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>📖 大学英语四级高频词 智能自测</h1>
+    <div class="header-actions">
+      <button class="theme-btn active" onclick="setTheme('light')">☀ 日间</button>
+      <button class="theme-btn" onclick="setTheme('dark')">🌙 夜间</button>
+      <button class="theme-btn" onclick="setTheme('eye-care')">🍃 护眼</button>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-card total"><div class="num" id="totalCount">0</div><div class="label">总答题数</div></div>
+    <div class="stat-card right"><div class="num" id="rightCount">0</div><div class="label">答对数</div></div>
+    <div class="stat-card wrong"><div class="num" id="wrongCount">0</div><div class="label">答错数</div></div>
+    <div class="stat-card rate"><div class="num" id="rateText">0%</div><div class="label">正确率</div></div>
+  </div>
+
+  <div class="cat-bar">
+    <span>分类选题：</span>
+    <button class="cat-btn active" onclick="setCategory('all')">全部</button>
+    <button class="cat-btn" onclick="setCategory('politics')">时政</button>
+    <button class="cat-btn" onclick="setCategory('tech')">科技</button>
+    <button class="cat-btn" onclick="setCategory('culture')">社会文化</button>
+    <button class="cat-btn" onclick="setCategory('campus')">校园</button>
+    <button class="cat-btn" onclick="setCategory('medical')">医疗</button>
+    <button class="cat-btn" onclick="setCategory('economy')">经济</button>
+    <button class="cat-btn" onclick="setCategory('environment')">环保</button>
+    <button class="cat-btn" onclick="setCategory('writing')">写作</button>
+    <button class="cat-btn" onclick="setCategory('research')">科研</button>
+  </div>
+
+  <div class="tool-bar">
+    <span class="mode-label">当前模式：<strong id="modeText">中译英</strong></span>
+    <button class="btn btn-outline btn-sm" onclick="switchMode('cn2en')">中译英</button>
+    <button class="btn btn-outline btn-sm" onclick="switchMode('en2cn')">英译中</button>
+    <span style="flex:1"></span>
+    <span class="mode-label">刷题：</span>
+    <button class="btn btn-outline btn-sm" id="modeSeqBtn" onclick="toggleSeqMode()">顺序</button>
+    <button class="btn btn-outline btn-sm" id="modeRandBtn" onclick="toggleSeqMode()">随机</button>
+    <span style="flex:1"></span>
+    <span class="mode-label">难度：</span>
+    <button class="btn btn-outline btn-sm" id="diffAllBtn" onclick="setDifficulty('all')">全部</button>
+    <button class="btn btn-outline btn-sm" id="diff1Btn" onclick="setDifficulty(1)">★</button>
+    <button class="btn btn-outline btn-sm" id="diff2Btn" onclick="setDifficulty(2)">★★</button>
+    <button class="btn btn-outline btn-sm" id="diff3Btn" onclick="setDifficulty(3)">★★★</button>
+  </div>
+
+  <div class="quiz-box" id="quizBox">
+    <div class="quiz-header">
+      <div class="cat-tag" id="catTag" style="display:none"></div>
+      <div class="difficulty-tag" id="diffTag" style="display:none"></div>
+      <div class="quiz-actions">
+        <button class="btn btn-outline btn-sm" id="favBtn" onclick="toggleFavorite()" title="收藏">☆</button>
+        <button class="btn btn-outline btn-sm" id="speakBtn" onclick="speakWord()" title="发音">🔊</button>
+        <button class="btn btn-outline btn-sm" id="exampleBtn" onclick="toggleExample()" title="例句">📝</button>
+      </div>
+    </div>
+    <div class="q-text" id="question">请点击下方按钮开始答题</div>
+    <div class="example-text" id="exampleText" style="display:none"></div>
+    <div class="input-row" id="answerRow">
+      <input type="text" id="userInput" placeholder="在此输入答案，按回车提交" autocomplete="off">
+      <button class="btn btn-primary" id="submitBtn" onclick="checkAnswer()">提交答案</button>
+    </div>
+    <div class="result" id="resText"></div>
+    <!-- 答错后照打区域 -->
+    <div id="rewriteArea" style="display:none"></div>
+    <div class="nav-bar">
+      <button class="btn btn-outline btn-sm" id="prevBtn" onclick="prevQuestion()" disabled>◀ 上一题</button>
+      <span class="nav-info" id="navInfo"></span>
+      <button class="btn btn-outline btn-sm" id="nextBtn" onclick="nextQuestion()" disabled>下一题 ▶</button>
+      <span style="flex:1"></span>
+      <button class="btn btn-primary btn-sm" onclick="getQuestion()">随机抽题</button>
+      <button class="btn btn-success btn-sm" id="reviewModeBtn" onclick="toggleReviewMode()">🧠 智能复习</button>
+      <button class="btn btn-warning btn-sm" onclick="redoError()">重做错题</button>
+      <button class="btn btn-danger btn-sm" onclick="clearErrors()">清空错题本</button>
+    </div>
+  </div>
+
+  <div class="error-panel" id="errorPanel">
+    <div class="error-panel-header" onclick="toggleErrorPanel()">
+      <h2>📋 错题本（<span id="errorCount">0</span>题）</h2>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="error-panel-body" id="errorBody"></div>
+  </div>
+
+  <div class="error-panel" id="reviewPanel" style="display:none;"></div>
+
+  <div class="favorite-panel" id="favoritePanel">
+    <div class="favorite-panel-header" onclick="toggleFavoritePanel()">
+      <h2>⭐ 收藏夹（<span id="favoriteCount">0</span>词）</h2>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="favorite-panel-body" id="favoriteBody"></div>
+  </div>
+
+  <div class="daily-goal-panel" id="dailyGoalPanel">
+    <div class="daily-goal-header">
+      <h2>🎯 今日目标</h2>
+      <div class="goal-progress">
+        <span id="goalProgress">0</span> / <input type="number" id="dailyGoalInput" value="30" min="1" max="200" onchange="updateDailyGoal()">
+      </div>
+    </div>
+    <div class="goal-bar">
+      <div class="goal-fill" id="goalFill" style="width: 0%"></div>
+    </div>
+    <div class="goal-stats">
+      <span>已答：<span id="todayAnswered">0</span></span>
+      <span>正确：<span id="todayCorrect">0</span></span>
+      <span>正确率：<span id="todayRate">0%</span></span>
+    </div>
+  </div>
+
+  <div class="tools-panel">
+    <h2>🛠️ 工具</h2>
+    <div class="tools-grid">
+      <button class="btn btn-outline" onclick="exportErrors()">📤 导出错题本</button>
+      <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">📥 导入错题本</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importErrors(event)">
+      <button class="btn btn-outline" onclick="exportFavorites()">📤 导出收藏</button>
+      <button class="btn btn-outline" onclick="document.getElementById('importFavFile').click()">📥 导入收藏</button>
+      <input type="file" id="importFavFile" accept=".json" style="display:none" onchange="importFavorites(event)">
+    </div>
+  </div>
+
+  <div class="keyboard-help">
+    <h3>⌨️ 快捷键</h3>
+    <div class="shortcut-list">
+      <span><kbd>Enter</kbd> 提交答案</span>
+      <span><kbd>Esc</kbd> 清空输入</span>
+      <span><kbd>←</kbd><kbd>→</kbd> 上/下一题</span>
+      <span><kbd>Space</kbd> 随机抽题</span>
+      <span><kbd>S</kbd> 发音</span>
+      <span><kbd>F</kbd> 收藏</span>
+      <span><kbd>R</kbd> 复习进度</span>
+    </div>
+  </div>
+  </div>
+
+<script>
+// ==================== 词库（9大分类，完整版） ====================
+const wordList = [
+  // ===== 1. 时政类 =====
+  { en:"Reform and Opening-up", cn:"改革开放", cat:"politics", difficulty:1, example:"China's Reform and Opening-up policy has transformed the economy." },
+  { en:"Since the reform and opening up", cn:"改革开放以来", cat:"politics", difficulty:1, example:"Since the reform and opening up, China has achieved remarkable progress." },
+  { en:"Belt and Road initiative", cn:"一带一路倡议", cat:"politics", difficulty:2, example:"The Belt and Road initiative promotes international cooperation." },
+  { en:"urbanization", cn:"城市化", cat:"politics", difficulty:1, example:"Urbanization has accelerated in developing countries." },
+  { en:"rural revitalization", cn:"乡村振兴", cat:"politics", difficulty:2, example:"Rural revitalization is crucial for balanced development." },
+  { en:"Poverty alleviation", cn:"脱贫，扶贫", cat:"politics", difficulty:1, note:"也说 alleviate poverty", example:"Poverty alleviation efforts have lifted millions out of poverty." },
+  { en:"alleviate poverty", cn:"脱贫，扶贫", cat:"politics", difficulty:1, example:"The government implemented policies to alleviate poverty." },
+  { en:"productivity", cn:"生产力", cat:"politics", difficulty:1, example:"Technology enhances productivity in manufacturing." },
+  { en:"New quality productive force", cn:"新质生产力", cat:"politics", difficulty:3, example:"New quality productive force drives economic transformation." },
+  { en:"High quality development", cn:"高质量发展", cat:"politics", difficulty:2, example:"High quality development focuses on sustainability." },
+  { en:"Chinese modernization", cn:"中国式现代化", cat:"politics", difficulty:2, example:"Chinese modernization combines tradition with innovation." },
+  { en:"Airport", cn:"机场", cat:"politics", difficulty:1, example:"The new airport will improve transportation infrastructure." },
+  { en:"high-speed rail station", cn:"高铁站", cat:"politics", difficulty:1, example:"High-speed rail stations connect major cities efficiently." },
+  { en:"delta", cn:"三角洲", cat:"politics", difficulty:1, example:"The Yangtze River delta is economically vibrant." },
+  { en:"Yangtze River delta", cn:"长江三角洲", cat:"politics", difficulty:2, example:"The Yangtze River delta region is a major economic hub." },
+  { en:"Greater Bay Area", cn:"大湾区", cat:"politics", difficulty:2, example:"The Greater Bay Area fosters regional integration." },
+  { en:"Pilot Free Trade Zone", cn:"实验自由贸易区", cat:"politics", difficulty:3, example:"Pilot Free Trade Zones试验新的经济 policies." },
+  { en:"Silver economy", cn:"银发经济", cat:"politics", difficulty:2, note:"面向老年人的经济产业", example:"The silver economy is growing with aging populations." },
+  { en:"Aging society", cn:"老龄化社会", cat:"politics", difficulty:2, note:"也说 aging community", example:"Japan is an example of an aging society." },
+  { en:"Aging community", cn:"老龄化社会", cat:"politics", difficulty:2, example:"Aging communities require better healthcare services." },
+  { en:"The elderly care service", cn:"养老服务", cat:"politics", difficulty:2, example:"Elderly care services are expanding in urban areas." },
+  { en:"Social welfare", cn:"社会福利", cat:"politics", difficulty:1, example:"Social welfare programs support vulnerable populations." },
+  { en:"Social security", cn:"社会保障", cat:"politics", difficulty:1, example:"Social security systems provide safety nets for citizens." },
+
+  // ===== 2. 科技类 =====
+  { en:"AI", cn:"人工智能", cat:"tech", difficulty:1, note:"artificial intelligence 缩写", example:"AI is transforming various industries." },
+  { en:"artificial intelligence", cn:"人工智能", cat:"tech", difficulty:1, note:"简称 AI", example:"Artificial intelligence mimics human cognitive functions." },
+  { en:"Artificial", cn:"人造的", cat:"tech", difficulty:1, example:"Artificial materials are widely used in construction." },
+  { en:"manual", cn:"手工的，人力的", cat:"tech", difficulty:1, example:"Manual labor is still essential in some industries." },
+  { en:"Intelligence", cn:"智能，情报", cat:"tech", difficulty:1, example:"Human intelligence is complex and multifaceted." },
+  { en:"Intelligent", cn:"智能的", cat:"tech", difficulty:1, example:"Intelligent systems can learn from data." },
+  { en:"smart", cn:"智能的", cat:"tech", difficulty:1, example:"Smart homes automate daily tasks." },
+  { en:"Smart economy", cn:"智能经济", cat:"tech", difficulty:2, example:"Smart economy leverages digital technologies." },
+  { en:"smart device", cn:"智能设备", cat:"tech", difficulty:1, example:"Smart devices are becoming increasingly popular." },
+  { en:"AI agent", cn:"智能体", cat:"tech", difficulty:2, example:"AI agents can perform tasks autonomously." },
+  { en:"LLM", cn:"大语言模型", cat:"tech", difficulty:2, note:"large language model", example:"LLMs are trained on vast text datasets." },
+  { en:"large language model", cn:"大语言模型", cat:"tech", difficulty:2, note:"简称 LLM", example:"Large language models generate human-like text." },
+  { en:"token", cn:"词元", cat:"tech", difficulty:2, example:"Tokens are basic units in language processing." },
+  { en:"Cryptocurrency", cn:"虚拟货币", cat:"tech", difficulty:2, example:"Cryptocurrency operates on decentralized networks." },
+  { en:"Blockchain", cn:"区块链", cat:"tech", difficulty:2, example:"Blockchain ensures secure and transparent transactions." },
+  { en:"Digital economy", cn:"数字经济", cat:"tech", difficulty:2, example:"The digital economy is growing rapidly worldwide." },
+  { en:"Digitization", cn:"数字化", cat:"tech", difficulty:1, example:"Digitization has revolutionized information storage." },
+  { en:"E-Commerce", cn:"电子商务", cat:"tech", difficulty:1, example:"E-Commerce platforms connect buyers and sellers globally." },
+  { en:"Algorithm", cn:"算法", cat:"tech", difficulty:2, example:"Efficient algorithms solve complex problems quickly." },
+  { en:"Social media", cn:"社交媒体", cat:"tech", difficulty:1, example:"Social media influences modern communication." },
+  { en:"Big data", cn:"大数据", cat:"tech", difficulty:2, example:"Big data analytics reveals hidden patterns." },
+  { en:"Cloud computing", cn:"云计算", cat:"tech", difficulty:2, example:"Cloud computing provides scalable resources on demand." },
+  { en:"VR", cn:"虚拟现实", cat:"tech", difficulty:2, note:"virtual reality", example:"VR creates immersive digital experiences." },
+  { en:"virtual reality", cn:"虚拟现实", cat:"tech", difficulty:2, note:"简称 VR", example:"Virtual reality is used in gaming and training." },
+  { en:"MR", cn:"混合现实", cat:"tech", difficulty:3, note:"mixed reality", example:"MR blends real and virtual worlds." },
+  { en:"mixed reality", cn:"混合现实", cat:"tech", difficulty:3, note:"简称 MR", example:"Mixed reality enhances interactive experiences." },
+  { en:"augmented reality", cn:"增强现实", cat:"tech", difficulty:2, note:"简称 AR", example:"Augmented reality is used in retail and education." },
+  { en:"5G", cn:"第五代移动通信技术", cat:"tech", difficulty:1, example:"5G enables faster and more reliable connectivity." },
+  { en:"Driverless car", cn:"无人驾驶汽车", cat:"tech", difficulty:2, example:"Driverless cars use sensors and AI to navigate." },
+  { en:"Self-driving car", cn:"无人驾驶汽车", cat:"tech", difficulty:2, example:"Self-driving cars promise safer roads." },
+  { en:"autonomous vehicle", cn:"无人驾驶汽车", cat:"tech", difficulty:3, example:"Autonomous vehicles are being tested in various cities." },
+  { en:"Assisted driving", cn:"辅助驾驶", cat:"tech", difficulty:2, example:"Assisted driving features improve road safety." },
+  { en:"Renewable energy", cn:"新能源，可再生能源", cat:"tech", difficulty:2, example:"Renewable energy reduces carbon emissions." },
+  { en:"Solar power", cn:"太阳能", cat:"tech", difficulty:1, example:"Solar power is a clean energy source." },
+  { en:"Wind power", cn:"风能", cat:"tech", difficulty:1, example:"Wind power harnesses energy from the wind." },
+  { en:"Hydro power", cn:"水电", cat:"tech", difficulty:1, example:"Hydro power generates electricity from water flow." },
+  { en:"Battery", cn:"电池", cat:"tech", difficulty:1, example:"Batteries store electrical energy for later use." },
+  { en:"Cyber security", cn:"网络安全", cat:"tech", difficulty:2, example:"Cyber security protects against digital threats." },
+  { en:"Privacy", cn:"隐私", cat:"tech", difficulty:1, example:"Privacy is a major concern in the digital age." },
+  { en:"Data security", cn:"数据安全", cat:"tech", difficulty:2, example:"Data security ensures information is protected." },
+  { en:"IOT", cn:"物联网", cat:"tech", difficulty:2, note:"Internet of Things", example:"IoT connects everyday devices to the internet." },
+  { en:"Internet of Things", cn:"物联网", cat:"tech", difficulty:2, note:"简称 IoT", example:"The Internet of Things is transforming smart homes." },
+
+  // ===== 3. 社会文化类 =====
+  { en:"Discrimination", cn:"歧视", cat:"culture", difficulty:2, example:"Discrimination based on race is illegal in many countries." },
+  { en:"Bias", cn:"偏见", cat:"culture", difficulty:2, example:"Unconscious bias can affect decision-making." },
+  { en:"Prejudice", cn:"偏见", cat:"culture", difficulty:2, example:"Prejudice often stems from lack of understanding." },
+  { en:"Stereotype", cn:"刻板印象", cat:"culture", difficulty:2, example:"Stereotypes can limit individual potential." },
+  { en:"Cliche", cn:"陈词滥调", cat:"culture", difficulty:2, example:"Avoid using clichés in formal writing." },
+  { en:"Workplace discrimination", cn:"职场歧视", cat:"culture", difficulty:2, example:"Workplace discrimination undermines team morale." },
+  { en:"sexism", cn:"性别歧视", cat:"culture", difficulty:2, example:"Sexism remains a persistent issue in many societies." },
+  { en:"Racism", cn:"种族歧视", cat:"culture", difficulty:2, example:"Racism is condemned by international human rights laws." },
+  { en:"Career development", cn:"职业发展", cat:"culture", difficulty:1, example:"Career development requires continuous learning." },
+  { en:"Quit", cn:"辞职", cat:"culture", difficulty:1, note:"也说 resign", example:"She decided to quit her job to start a business." },
+  { en:"resign", cn:"辞职", cat:"culture", difficulty:1, example:"He resigned from his position after the scandal." },
+  { en:"Unemployment", cn:"失业", cat:"culture", difficulty:1, example:"Unemployment rates have increased during the recession." },
+  { en:"peer pressure", cn:"同辈压力", cat:"culture", difficulty:2, example:"Peer pressure can influence teenagers' behavior." },
+  { en:"Work-life balance", cn:"工作生活平衡", cat:"culture", difficulty:1, example:"Maintaining work-life balance is essential for well-being." },
+  { en:"lifelong learning", cn:"终身学习", cat:"culture", difficulty:2, example:"Lifelong learning helps adapt to changing job markets." },
+  { en:"Traditional", cn:"传统的", cat:"culture", difficulty:1, note:"也说 conventional", example:"Traditional customs are preserved in rural areas." },
+  { en:"conventional", cn:"传统的", cat:"culture", difficulty:1, example:"Conventional methods are still widely used." },
+  { en:"Custom", cn:"风俗", cat:"culture", difficulty:1, example:"Each culture has its own unique customs." },
+  { en:"Intangible culture", cn:"非物质文化", cat:"culture", difficulty:3, example:"Intangible culture includes rituals and oral traditions." },
+  { en:"Inherit", cn:"继承", cat:"culture", difficulty:2, example:"Children inherit cultural values from their parents." },
+  { en:"craftsmanship", cn:"工艺", cat:"culture", difficulty:2, example:"The craftsmanship of ancient artifacts is remarkable." },
+  { en:"craftsman spirit", cn:"工匠精神", cat:"culture", difficulty:2, example:"Craftsman spirit emphasizes dedication to quality." },
+  { en:"Exquisite craftsmanship", cn:"精湛的工艺", cat:"culture", difficulty:3, example:"The museum displays exquisite craftsmanship." },
+  { en:"National treasure", cn:"国宝", cat:"culture", difficulty:2, example:"Giant pandas are considered national treasures." },
+  { en:"Dynasty", cn:"朝代", cat:"culture", difficulty:1, note:"如 Tang Dynasty 唐朝", example:"The Tang Dynasty was a golden age of Chinese culture." },
+  { en:"Symbol", cn:"象征", cat:"culture", difficulty:1, note:"动词 symbolize / 形容词 symbolic", example:"The dove is a symbol of peace." },
+  { en:"symbolize", cn:"是…的象征", cat:"culture", difficulty:2, example:"Red often symbolizes good luck in Chinese culture." },
+  { en:"symbolic", cn:"象征性的", cat:"culture", difficulty:2, example:"The handshake was a symbolic gesture of unity." },
+  { en:"Prosperity", cn:"繁荣", cat:"culture", difficulty:2, note:"形容词 prosperous", example:"The country experienced economic prosperity." },
+  { en:"prosperous", cn:"繁荣的", cat:"culture", difficulty:2, example:"The prosperous city attracts many investors." },
+  { en:"common prosperity", cn:"共同富裕", cat:"culture", difficulty:3, example:"Common prosperity is a long-term goal for society." },
+  { en:"Ceremony", cn:"仪式", cat:"culture", difficulty:1, note:"也说 ritual", example:"The opening ceremony was attended by dignitaries." },
+  { en:"ritual", cn:"仪式", cat:"culture", difficulty:1, example:"The ritual has been performed for centuries." },
+
+  // ===== 4. 校园话题类 =====
+  // 学生与学位
+  { en:"Student", cn:"学生", cat:"campus", difficulty:1, example:"The student is studying computer science." },
+  { en:"freshman", cn:"大一学生", cat:"campus", difficulty:1, example:"Freshmen often face challenges adjusting to college life." },
+  { en:"sophomore", cn:"大二学生", cat:"campus", difficulty:1, example:"Sophomores usually declare their major." },
+  { en:"junior student", cn:"大三学生", cat:"campus", difficulty:1, example:"Junior students start preparing for internships." },
+  { en:"senior student", cn:"大四学生", cat:"campus", difficulty:1, example:"Senior students focus on graduation projects." },
+  { en:"graduate", cn:"毕业生", cat:"campus", difficulty:1, example:"The graduate found a job in a tech company." },
+  { en:"community college", cn:"社区学院", cat:"campus", difficulty:2, example:"Community colleges offer affordable education." },
+  { en:"College", cn:"学院", cat:"campus", difficulty:1, note:"也说 university 大学", example:"She attended a prestigious college." },
+  { en:"university", cn:"大学", cat:"campus", difficulty:1, example:"The university is known for its research programs." },
+  { en:"associate bachelor", cn:"副学士（学位）", cat:"campus", difficulty:3, example:"An associate bachelor degree takes two years to complete." },
+  { en:"Undergraduate", cn:"本科生", cat:"campus", difficulty:2, example:"Undergraduate students take general education courses." },
+  { en:"bachelor degree", cn:"本科学位", cat:"campus", difficulty:2, example:"A bachelor degree is required for many jobs." },
+  { en:"Diploma", cn:"毕业文凭", cat:"campus", difficulty:1, example:"She received her diploma at the graduation ceremony." },
+  { en:"Postgraduate", cn:"研究生", cat:"campus", difficulty:2, example:"Postgraduate students conduct advanced research." },
+  { en:"master", cn:"硕士", cat:"campus", difficulty:2, example:"He is pursuing a master's degree in economics." },
+  { en:"doctor", cn:"博士", cat:"campus", difficulty:2, example:"The doctor published several research papers." },
+  { en:"Doctorate", cn:"博士学位", cat:"campus", difficulty:2, note:"也说 PhD", example:"Earning a doctorate requires years of study." },
+  { en:"PhD", cn:"博士学位", cat:"campus", difficulty:2, example:"She completed her PhD in physics." },
+  // 校园设施
+  { en:"School", cn:"学校", cat:"campus", difficulty:1, example:"The school has excellent facilities." },
+  { en:"Campus", cn:"校园", cat:"campus", difficulty:1, example:"The campus is beautiful in autumn." },
+  { en:"clinic", cn:"诊所", cat:"campus", difficulty:1, example:"The campus clinic provides basic healthcare." },
+  { en:"library", cn:"图书馆", cat:"campus", difficulty:1, example:"The library has a vast collection of books." },
+  { en:"Dining hall", cn:"食堂", cat:"campus", difficulty:1, example:"The dining hall serves affordable meals." },
+  { en:"dormitory", cn:"宿舍", cat:"campus", difficulty:1, example:"The dormitory is conveniently located near classes." },
+  // 课程与教学
+  { en:"Class", cn:"课程", cat:"campus", difficulty:1, example:"The class meets twice a week." },
+  { en:"Lecture", cn:"讲座", cat:"campus", difficulty:1, example:"The lecture covered modern history." },
+  { en:"lesson", cn:"课程", cat:"campus", difficulty:1, example:"Today's lesson is about grammar." },
+  { en:"curriculum", cn:"课程大纲", cat:"campus", difficulty:2, example:"The curriculum includes both theory and practice." },
+  { en:"Extracurricular", cn:"课外的", cat:"campus", difficulty:2, example:"Extracurricular activities enhance student life." },
+  { en:"teacher", cn:"老师", cat:"campus", difficulty:1, example:"The teacher is very patient with students." },
+  { en:"Lecturer", cn:"讲师", cat:"campus", difficulty:2, example:"The lecturer specializes in linguistics." },
+  { en:"professor", cn:"教授", cat:"campus", difficulty:1, example:"The professor is a leading expert in AI." },
+  { en:"Associate professor", cn:"副教授", cat:"campus", difficulty:2, example:"The associate professor teaches undergraduate courses." },
+  { en:"Tutor", cn:"导师", cat:"campus", difficulty:1, note:"也说 instructor", example:"The tutor provides personalized guidance." },
+  { en:"instructor", cn:"导师", cat:"campus", difficulty:1, example:"The instructor leads the lab sessions." },
+  { en:"Faculty", cn:"全体教员", cat:"campus", difficulty:2, note:"与 facility（设施）区分", example:"The faculty includes professors from various departments." },
+  { en:"facility", cn:"设施", cat:"campus", difficulty:1, example:"The new facility includes a swimming pool." },
+  // 作业与学习
+  { en:"Homework", cn:"作业", cat:"campus", difficulty:1, example:"The homework is due next Monday." },
+  { en:"Assignment", cn:"任务，作业", cat:"campus", difficulty:1, example:"The assignment requires critical thinking." },
+  { en:"Assign", cn:"分配", cat:"campus", difficulty:1, example:"The teacher will assign groups for the project." },
+  { en:"Handout", cn:"讲义，手册", cat:"campus", difficulty:2, example:"The handout summarizes the lecture points." },
+  { en:"Internship", cn:"实习", cat:"campus", difficulty:2, example:"The internship provides practical experience." },
+  { en:"fieldwork", cn:"实地工作", cat:"campus", difficulty:2, example:"Fieldwork is essential for anthropology students." },
+  { en:"field trip", cn:"实地考察", cat:"campus", difficulty:1, example:"The field trip to the museum was educational." },
+  { en:"Online courses", cn:"网课", cat:"campus", difficulty:1, example:"Online courses offer flexible learning schedules." },
+  { en:"MOOCs", cn:"慕课", cat:"campus", difficulty:2, note:"massive open online course 大型开放式网络课程", example:"MOOCs make education accessible to everyone." },
+  { en:"Online education", cn:"网络教育", cat:"campus", difficulty:2, example:"Online education has grown rapidly during the pandemic." },
+  { en:"distance learning", cn:"远程教育", cat:"campus", difficulty:2, example:"Distance learning requires self-discipline." },
+  { en:"Internet-based learning", cn:"基于网络的教学", cat:"campus", difficulty:3, example:"Internet-based learning uses digital platforms." },
+  { en:"Telemedicine", cn:"远程医疗", cat:"campus", difficulty:3, example:"Telemedicine allows patients to consult doctors remotely." },
+  { en:"Cram", cn:"填鸭式教学", cat:"campus", difficulty:2, example:"Cramming before exams is not effective long-term." },
+  { en:"cram school", cn:"补习学校", cat:"campus", difficulty:2, example:"Cram schools are popular in many Asian countries." },
+  { en:"Thesis", cn:"论文", cat:"campus", difficulty:2, example:"The thesis defense is scheduled for next week." },
+  { en:"Plagiarism", cn:"抄袭", cat:"campus", difficulty:2, example:"Plagiarism is a serious academic offense." },
+  { en:"AI generated", cn:"AI生成", cat:"campus", difficulty:2, example:"AI generated content needs careful verification." },
+  { en:"Plagiarist", cn:"抄袭者", cat:"campus", difficulty:2, example:"The plagiarist was expelled from university." },
+  { en:"Tuition", cn:"学费", cat:"campus", difficulty:1, example:"Tuition fees have increased over the years." },
+  { en:"scholarship", cn:"奖学金", cat:"campus", difficulty:1, example:"She won a scholarship for academic excellence." },
+  { en:"Certificate", cn:"证书", cat:"campus", difficulty:1, example:"The certificate verifies her qualifications." },
+
+  // ===== 5. 医疗健康类 =====
+  { en:"Health", cn:"健康", cat:"medical", difficulty:1, note:"形容词 healthy", example:"Health is the most important thing in life." },
+  { en:"fitness", cn:"健康", cat:"medical", difficulty:1, example:"Regular exercise improves fitness levels." },
+  { en:"healthy", cn:"健康的", cat:"medical", difficulty:1, example:"A healthy diet includes plenty of vegetables." },
+  { en:"Medical", cn:"医疗的", cat:"medical", difficulty:1, example:"Medical research has led to new treatments." },
+  { en:"medicine", cn:"药物", cat:"medical", difficulty:1, example:"The doctor prescribed medicine for the infection." },
+  { en:"Pill", cn:"药片", cat:"medical", difficulty:1, example:"Take one pill twice daily." },
+  { en:"capsule", cn:"胶囊", cat:"medical", difficulty:1, example:"The medicine comes in capsule form." },
+  { en:"Illness", cn:"疾病", cat:"medical", difficulty:1, example:"The illness spread quickly through the school." },
+  { en:"disease", cn:"疾病（更严重）", cat:"medical", difficulty:2, example:"Heart disease is a leading cause of death." },
+  { en:"Diabetes", cn:"糖尿病", cat:"medical", difficulty:2, example:"Diabetes requires careful management." },
+  { en:"Stroke", cn:"中风", cat:"medical", difficulty:2, note:"heart stroke 心脏病发作", example:"A stroke can cause permanent disability." },
+  { en:"High blood pressure", cn:"高血压", cat:"medical", difficulty:2, note:"也说 hypertension", example:"High blood pressure increases heart disease risk." },
+  { en:"hypertension", cn:"高血压", cat:"medical", difficulty:2, example:"Hypertension often has no symptoms." },
+  { en:"Heart attack", cn:"心脏病发作", cat:"medical", difficulty:2, example:"A heart attack requires immediate medical attention." },
+  { en:"Obesity", cn:"肥胖", cat:"medical", difficulty:2, note:"形容词 obese / fat", example:"Obesity is linked to several chronic diseases." },
+  { en:"obese", cn:"肥胖的", cat:"medical", difficulty:2, example:"Obese individuals have higher health risks." },
+  { en:"Immunity", cn:"免疫力", cat:"medical", difficulty:2, note:"形容词 immune", example:"Good nutrition boosts immunity." },
+  { en:"immune", cn:"免疫的", cat:"medical", difficulty:2, example:"Once immune, the body can fight infections." },
+  { en:"Immune system", cn:"免疫系统", cat:"medical", difficulty:2, example:"The immune system protects against pathogens." },
+  { en:"bacteria", cn:"细菌", cat:"medical", difficulty:2, example:"Bacteria can cause food poisoning." },
+  { en:"virus", cn:"病毒", cat:"medical", difficulty:1, note:"go viral 病毒式传播", example:"The virus mutated into a new variant." },
+  { en:"microorganism", cn:"微生物", cat:"medical", difficulty:3, example:"Microorganisms are studied in microbiology." },
+  { en:"Infection", cn:"感染", cat:"medical", difficulty:2, example:"The wound became infected." },
+  { en:"Injection", cn:"注射", cat:"medical", difficulty:1, example:"The injection was given in the arm." },
+  { en:"Pandemic", cn:"流行病，全球传染病", cat:"medical", difficulty:2, example:"The pandemic affected global economies." },
+  { en:"Vaccination", cn:"接种疫苗", cat:"medical", difficulty:2, note:"动词 vaccinate", example:"Vaccination programs have saved millions of lives." },
+  { en:"vaccinate", cn:"接种疫苗", cat:"medical", difficulty:2, example:"Children should be vaccinated against common diseases." },
+  { en:"Epidemic", cn:"流行病", cat:"medical", difficulty:2, example:"The epidemic was contained through public health measures." },
+  { en:"Face mask", cn:"口罩", cat:"medical", difficulty:1, example:"Wearing a face mask can reduce virus transmission." },
+  { en:"dementia", cn:"痴呆", cat:"medical", difficulty:3, example:"Dementia affects memory and cognitive function." },
+  { en:"Symptom", cn:"症状", cat:"medical", difficulty:2, example:"Fever is a common symptom of infection." },
+  { en:"Diagnose", cn:"诊断(v.)", cat:"medical", difficulty:2, note:"名词 diagnosis", example:"Doctors use tests to diagnose diseases." },
+  { en:"diagnosis", cn:"诊断(n.)", cat:"medical", difficulty:2, example:"The diagnosis confirmed it was a minor infection." },
+  { en:"Mental state", cn:"心理状况", cat:"medical", difficulty:2, example:"Stress can affect your mental state." },
+  { en:"Anxiety", cn:"焦虑", cat:"medical", difficulty:2, example:"Anxiety disorders are common mental health conditions." },
+  { en:"Depression", cn:"抑郁症", cat:"medical", difficulty:2, example:"Depression is more than just feeling sad." },
+
+  // ===== 6. 经济发展类 =====
+  { en:"Tax", cn:"税", cat:"economy", difficulty:1, note:"也说 taxation", example:"The government collects taxes to fund public services." },
+  { en:"taxation", cn:"税", cat:"economy", difficulty:2, example:"Taxation policies affect economic growth." },
+  { en:"Levy tax on", cn:"征收税", cat:"economy", difficulty:3, example:"The government levies tax on imported goods." },
+  { en:"Tariff", cn:"关税", cat:"economy", difficulty:2, example:"Tariffs protect domestic industries." },
+  { en:"Financial", cn:"财政的，财务的", cat:"economy", difficulty:2, example:"Financial stability is crucial for economic growth." },
+  { en:"Fiscal", cn:"财务的", cat:"economy", difficulty:2, example:"Fiscal policy influences inflation and employment." },
+  { en:"private economy", cn:"民营经济", cat:"economy", difficulty:2, example:"The private economy creates many jobs." },
+  { en:"state-owned economy", cn:"国有经济", cat:"economy", difficulty:2, example:"State-owned enterprises play a key role in infrastructure." },
+  { en:"Improve business environment", cn:"优化营商环境", cat:"economy", difficulty:3, example:"Improving the business environment attracts investment." },
+  { en:"Advanced manufacturing", cn:"先进制造业", cat:"economy", difficulty:3, example:"Advanced manufacturing uses cutting-edge technology." },
+  { en:"Supply chain", cn:"供应链", cat:"economy", difficulty:2, example:"The supply chain was disrupted by the pandemic." },
+  { en:"Industrial chain", cn:"产业链", cat:"economy", difficulty:2, example:"A complete industrial chain enhances competitiveness." },
+  { en:"Chain shop", cn:"连锁店", cat:"economy", difficulty:1, example:"Chain shops offer consistent products nationwide." },
+  { en:"Inflation", cn:"通货膨胀", cat:"economy", difficulty:2, example:"Inflation reduces purchasing power." },
+  { en:"Deflation", cn:"通货紧缩", cat:"economy", difficulty:3, example:"Deflation can lead to reduced consumer spending." },
+  { en:"Stimulus", cn:"刺激", cat:"economy", difficulty:2, example:"The government provided economic stimulus during the recession." },
+
+  // ===== 7. 环保类 =====
+  { en:"Environmentally friendly", cn:"环境友好的", cat:"environment", difficulty:2, example:"Environmentally friendly products reduce ecological impact." },
+  { en:"Environmental protection", cn:"环境保护", cat:"environment", difficulty:2, example:"Environmental protection is everyone's responsibility." },
+  { en:"Pollution", cn:"污染", cat:"environment", difficulty:1, example:"Air pollution is a major concern in cities." },
+  { en:"Global warming", cn:"全球变暖", cat:"environment", difficulty:2, example:"Global warming causes rising sea levels." },
+  { en:"Climate change", cn:"气候变化", cat:"environment", difficulty:2, example:"Climate change affects weather patterns worldwide." },
+  { en:"Extreme weathers", cn:"极端天气", cat:"environment", difficulty:2, example:"Extreme weathers are becoming more frequent." },
+  { en:"Disaster", cn:"灾难", cat:"environment", difficulty:1, example:"Natural disasters can cause widespread damage." },
+  { en:"flood", cn:"洪水", cat:"environment", difficulty:1, example:"The flood destroyed many homes." },
+  { en:"earthquake", cn:"地震", cat:"environment", difficulty:1, example:"The earthquake measured 6.5 on the Richter scale." },
+  { en:"Drought", cn:"干旱", cat:"environment", difficulty:2, example:"The drought lasted for several months." },
+  { en:"Ecosystem", cn:"生态系统", cat:"environment", difficulty:2, example:"Healthy ecosystems support biodiversity." },
+  { en:"Ecological", cn:"生态的", cat:"environment", difficulty:2, example:"Ecological balance is essential for survival." },
+  { en:"Biodiversity", cn:"生物多样性", cat:"environment", difficulty:3, example:"Biodiversity loss threatens ecosystem stability." },
+  { en:"Carbon neutrality", cn:"碳中和", cat:"environment", difficulty:3, example:"Carbon neutrality aims to balance emissions with absorption." },
+  { en:"Carbon dioxide", cn:"二氧化碳", cat:"environment", difficulty:2, example:"Carbon dioxide is a greenhouse gas." },
+  { en:"Greenhouse gas", cn:"温室气体", cat:"environment", difficulty:2, example:"Greenhouse gases trap heat in the atmosphere." },
+  { en:"Greenhouse effect", cn:"温室效应", cat:"environment", difficulty:2, example:"The greenhouse effect causes global warming." },
+  { en:"Greenhouse gas emission", cn:"温室气体排放", cat:"environment", difficulty:3, example:"Reducing greenhouse gas emission is critical." },
+  { en:"Sustainable development", cn:"可持续发展", cat:"environment", difficulty:2, example:"Sustainable development meets present needs without compromising the future." },
+  { en:"Emit", cn:"排放", cat:"environment", difficulty:1, example:"Factories emit pollutants into the air." },
+  { en:"Forest", cn:"森林", cat:"environment", difficulty:1, example:"Forests are vital for carbon absorption." },
+  { en:"Deforestation", cn:"砍伐森林", cat:"environment", difficulty:2, example:"Deforestation contributes to climate change." },
+  { en:"Reforestation", cn:"植树造林", cat:"environment", difficulty:3, example:"Reforestation helps restore ecosystems." },
+  { en:"Recycle", cn:"回收", cat:"environment", difficulty:1, example:"Recycling reduces waste in landfills." },
+
+  // ===== 8. 写作通用类 =====
+  { en:"Proposal", cn:"提案，建议", cat:"writing", difficulty:2, example:"The proposal was accepted by the committee." },
+  { en:"Submission", cn:"投稿", cat:"writing", difficulty:2, example:"The submission deadline is next Friday." },
+  { en:"essay", cn:"论文，短文", cat:"writing", difficulty:1, example:"The essay argued for environmental protection." },
+  { en:"Request", cn:"申请", cat:"writing", difficulty:1, example:"She submitted a request for time off." },
+  { en:"Application", cn:"申请", cat:"writing", difficulty:1, example:"The application form requires personal details." },
+  { en:"CV", cn:"简历", cat:"writing", difficulty:1, note:"Curriculum Vitae", example:"A well-written CV can impress employers." },
+  { en:"resume", cn:"简历", cat:"writing", difficulty:1, note:"美式常用", example:"The resume highlights relevant experience." },
+  { en:"Apply", cn:"应用，申请", cat:"writing", difficulty:1, note:"app 应用程序", example:"You can apply online through the website." },
+  { en:"app", cn:"应用程序", cat:"writing", difficulty:1, example:"The app helps users track their fitness goals." },
+  { en:"Notice", cn:"通知", cat:"writing", difficulty:1, example:"The notice was posted on the bulletin board." },
+  { en:"announcement", cn:"公告", cat:"writing", difficulty:1, example:"The company made an official announcement." },
+  { en:"News report", cn:"新闻报告", cat:"writing", difficulty:1, example:"The news report covered the local election." },
+  { en:"Introduction", cn:"简介", cat:"writing", difficulty:1, example:"The introduction provides background information." },
+  { en:"Summary", cn:"总结", cat:"writing", difficulty:1, example:"The summary captures the main points of the article." },
+  { en:"Survey", cn:"调查", cat:"writing", difficulty:1, example:"The survey revealed interesting trends." },
+  { en:"Advertisement", cn:"广告", cat:"writing", difficulty:1, example:"The advertisement was displayed on television." },
+
+  // ===== 9. 科研实验类 =====
+  // 实验主题
+  { en:"experiment", cn:"实验", cat:"research", difficulty:1, example:"The experiment yielded unexpected results." },
+  { en:"project", cn:"项目", cat:"research", difficulty:1, example:"The research project was funded by the government." },
+  { en:"program", cn:"项目", cat:"research", difficulty:1, example:"The program aims to improve public health." },
+  { en:"vote", cn:"投票", cat:"research", difficulty:1, example:"The vote was held to decide the new policy." },
+  { en:"survey", cn:"调查", cat:"research", difficulty:1, example:"The survey collected data from 1000 participants." },
+  { en:"study", cn:"调查，研究", cat:"research", difficulty:1, example:"The study examined the effects of climate change." },
+  { en:"poll", cn:"投票，公投", cat:"research", difficulty:2, example:"The poll showed mixed opinions on the issue." },
+  { en:"aim", cn:"目的", cat:"research", difficulty:1, note:"同 goal / objective / purpose / intention / target", example:"The aim of the research is to find a cure." },
+  { en:"goal", cn:"目标", cat:"research", difficulty:1, example:"The goal is to reduce carbon emissions." },
+  { en:"objective", cn:"目的，客观的", cat:"research", difficulty:2, example:"The objective of the study was clearly defined." },
+  { en:"purpose", cn:"目的", cat:"research", difficulty:1, example:"The purpose of the meeting was to discuss progress." },
+  { en:"intention", cn:"意图", cat:"research", difficulty:2, example:"Her intention was to help the community." },
+  { en:"target", cn:"目标", cat:"research", difficulty:1, example:"The target audience is young adults." },
+  // 实验手段/方法
+  { en:"practice", cn:"措施", cat:"research", difficulty:1, example:"Best practices should be followed in research." },
+  { en:"means", cn:"方法", cat:"research", difficulty:2, example:"Various means were used to collect data." },
+  { en:"initiative", cn:"举措", cat:"research", difficulty:2, example:"The new initiative aims to improve education." },
+  { en:"measure", cn:"方法", cat:"research", difficulty:1, example:"Measures were taken to ensure accuracy." },
+  { en:"method", cn:"方法", cat:"research", difficulty:1, example:"The method used was scientifically sound." },
+  { en:"way", cn:"方法", cat:"research", difficulty:1, example:"There are many ways to approach this problem." },
+  { en:"illustrate", cn:"证明", cat:"research", difficulty:2, example:"The data illustrates a clear trend." },
+  { en:"suggest", cn:"表明", cat:"research", difficulty:1, example:"The results suggest a correlation between variables." },
+  { en:"indicate", cn:"指出", cat:"research", difficulty:2, example:"The findings indicate the need for further research." },
+  { en:"demonstrate", cn:"证明", cat:"research", difficulty:2, example:"The experiment demonstrates the theory." },
+  { en:"find", cn:"发现", cat:"research", difficulty:1, example:"Researchers found significant evidence." },
+  { en:"reveal", cn:"揭露", cat:"research", difficulty:2, example:"The study revealed surprising patterns." },
+  { en:"display", cn:"显示", cat:"research", difficulty:1, example:"The graph displays the results clearly." },
+  { en:"show", cn:"显示", cat:"research", difficulty:1, example:"The data shows an upward trend." },
+  { en:"turn out", cn:"结果是", cat:"research", difficulty:2, example:"The experiment turned out to be successful." },
+  // 参与者/对象
+  { en:"respondent", cn:"受访者", cat:"research", difficulty:2, example:"The respondents provided valuable feedback." },
+  { en:"participant", cn:"参与者", cat:"research", difficulty:1, example:"All participants signed the consent form." },
+  { en:"colleague", cn:"同事", cat:"research", difficulty:1, example:"She collaborated with colleagues on the project." },
+  { en:"team", cn:"团队", cat:"research", difficulty:1, example:"The team worked together to achieve the goal." },
+  // 设施/环境
+  { en:"Faculty", cn:"教员", cat:"research", difficulty:2, example:"The faculty includes experts in various fields." },
+  { en:"facility", cn:"设施设备", cat:"research", difficulty:1, example:"The research facility is well-equipped." },
+  { en:"Infrastructure", cn:"基础设施", cat:"research", difficulty:2, example:"Infrastructure development is essential for growth." },
+  { en:"Power grid", cn:"电网", cat:"research", difficulty:2, example:"The power grid supplies electricity to homes." },
+  { en:"bridge", cn:"桥梁", cat:"research", difficulty:1, example:"The bridge connects the two cities." },
+];
+
+// ==================== 全局状态 ====================
+const STORAGE_KEY = "cet4_quiz_data_v2";
+
+let state = {
+  mode: "cn2en",
+  category: "all",
+  difficulty: "all",
+  isSeqMode: false,
+  seqIndex: -1,
+  currentWord: null,
+  errorList: [],           // [{ en, cn, cat, note, count }]
+  favorites: [],           // [{ en, cn, cat, note, difficulty, example }]
+  totalAnswered: 0,
+  rightAnswered: 0,
+  wrongAnswered: 0,
+  theme: "light",
+  isSubmitting: false,
+  history: [],
+  historyIndex: -1,
+  // 照打状态
+  rewritePhase: false,     // 是否处于"照打正确答案"阶段
+  rewriteCorrectAns: "",   // 需要照打的正确答案
+  // 每日目标
+  dailyGoal: 30,
+  todayAnswered: 0,
+  todayCorrect: 0,
+  todayDate: "",
+  // 显示例句
+  showExample: false,
+  // 答题计时
+  answerStartTime: 0,
+  // SM-2间隔重复数据：{ [wordKey]: { repetition, interval, efactor, nextReview, lastReview } }
+  sm2Data: {},
+  // 智能复习模式
+  reviewMode: false,
+};
+
+// ==================== SM-2 间隔重复算法 ====================
+function sm2(wordKey, quality) {
+  if (quality < 0) quality = 0;
+  if (quality > 5) quality = 5;
+  let data = state.sm2Data[wordKey];
+  if (!data) {
+    data = { repetition: 0, interval: 0, efactor: 2.5, nextReview: Date.now(), lastReview: null };
+  }
+  if (quality >= 3) {
+    if (data.repetition === 0) data.interval = 1;
+    else if (data.repetition === 1) data.interval = 6;
+    else data.interval = Math.round(data.interval * data.efactor);
+    data.repetition++;
+  } else {
+    data.repetition = 0;
+    data.interval = 1;
+  }
+  data.efactor = data.efactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+  if (data.efactor < 1.3) data.efactor = 1.3;
+  data.lastReview = Date.now();
+  data.nextReview = Date.now() + data.interval * 24 * 60 * 60 * 1000;
+  state.sm2Data[wordKey] = data;
+  saveState();
+  return data;
+}
+
+function getSm2Data(wordKey) {
+  return state.sm2Data[wordKey] || null;
+}
+
+function getWordKey(word) {
+  return word.en + '|' + word.cn;
+}
+
+function needsReview(word) {
+  const data = getSm2Data(getWordKey(word));
+  if (!data) return true;
+  return Date.now() >= data.nextReview;
+}
+
+function getMasteryLevel(word) {
+  const data = getSm2Data(getWordKey(word));
+  if (!data) return 0;
+  if (data.repetition >= 5) return 5;
+  return data.repetition;
+}
+
+function getReviewProgress() {
+  const list = getFilteredList();
+  const total = list.length;
+  const reviewed = list.filter(w => !needsReview(w)).length;
+  return { total, reviewed, percentage: total > 0 ? Math.round((reviewed / total) * 100) : 0 };
+}
+
+function getReviewList() {
+  const list = getFilteredList();
+  return list.filter(w => needsReview(w));
+}
+
+function getSmartQuestion() {
+  if (!state.reviewMode) {
+    getQuestion();
+    return;
+  }
+  const reviewList = getReviewList();
+  if (reviewList.length > 0) {
+    const idx = Math.floor(Math.random() * reviewList.length);
+    state.currentWord = reviewList[idx];
+  } else {
+    const list = getFilteredList();
+    if (list.length === 0) { alert("该分类暂无词汇！"); return; }
+    const idx = Math.floor(Math.random() * list.length);
+    state.currentWord = list[idx];
+  }
+  if (state.historyIndex < state.history.length - 1) {
+    state.history = state.history.slice(0, state.historyIndex + 1);
+  }
+  state.history.push(state.currentWord);
+  state.historyIndex = state.history.length - 1;
+  showQuestion(state.currentWord);
+}
+
+function toggleReviewMode() {
+  state.reviewMode = !state.reviewMode;
+  updateReviewModeUI();
+  saveState();
+  const resDom = document.getElementById("resText");
+  if (state.reviewMode) {
+    const reviewList = getReviewList();
+    resDom.innerText = "已开启智能复习，待复习 " + reviewList.length + " 个单词";
+  } else {
+    resDom.innerText = "已关闭智能复习，恢复随机抽题";
+  }
+  resDom.className = "result show";
+  setTimeout(() => { resDom.className = "result"; }, 2000);
+}
+
+function updateReviewModeUI() {
+  const btn = document.getElementById("reviewModeBtn");
+  if (!btn) return;
+  if (state.reviewMode) {
+    btn.classList.add("active");
+    btn.style.background = "var(--success)";
+    btn.style.color = "#fff";
+  } else {
+    btn.classList.remove("active");
+    btn.style.background = "";
+    btn.style.color = "";
+  }
+}
+
+function getMasteryTag(word) {
+  const level = getMasteryLevel(word);
+  const tags = ["🆕 新词", "⭐ 初学", "⭐⭐ 熟悉", "⭐⭐⭐ 掌握", "⭐⭐⭐⭐ 熟练", "🌟 精通"];
+  return tags[level] || tags[0];
+}
+
+function getNextReviewText(word) {
+  const data = getSm2Data(getWordKey(word));
+  if (!data) return "未学习";
+  const diff = data.nextReview - Date.now();
+  if (diff <= 0) return "现在复习";
+  const days = Math.ceil(diff / (24 * 60 * 60 * 1000));
+  if (days === 1) return "明天复习";
+  return days + "天后复习";
+}
+
+function showReviewPanel() {
+  const list = getFilteredList();
+  let html = '<div style="padding:14px 18px;">';
+  html += '<h2 style="font-size:16px;margin:0 0 12px;">📊 复习进度</h2>';
+  const progress = getReviewProgress();
+  html += '<div style="margin-bottom:12px;font-size:14px;color:var(--text-secondary);">';
+  html += '已掌握 ' + progress.reviewed + '/' + progress.total + ' (' + progress.percentage + '%)';
+  html += '</div>';
+  html += '<div style="height:8px;background:var(--hover-bg);border-radius:4px;margin-bottom:12px;overflow:hidden;">';
+  html += '<div style="height:100%;background:var(--success);border-radius:4px;width:' + progress.percentage + '%;transition:width .3s ease;"></div>';
+  html += '</div>';
+  const reviewList = getReviewList();
+  if (reviewList.length > 0) {
+    html += '<div style="font-size:14px;color:var(--text-secondary);margin-bottom:8px;">📝 待复习：' + reviewList.length + '个单词</div>';
+    html += '<div style="max-height:200px;overflow-y:auto;">';
+    reviewList.slice(0, 20).forEach(w => {
+      const mastery = getMasteryTag(w);
+      const next = getNextReviewText(w);
+      html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;">';
+      html += '<span><span style="color:var(--primary);font-weight:500;">' + w.en + '</span> <span style="color:var(--text-secondary);">' + w.cn + '</span></span>';
+      html += '<span style="white-space:nowrap;">' + mastery + ' · ' + next + '</span>';
+      html += '</div>';
+    });
+    if (reviewList.length > 20) html += '<div style="padding:8px 0;font-size:12px;color:var(--text-secondary);text-align:center;">...还有' + (reviewList.length - 20) + '个单词</div>';
+    html += '</div>';
+  } else {
+    html += '<div style="font-size:14px;color:var(--success);">🎉 所有单词都已复习！</div>';
+  }
+  html += '</div>';
+  const panel = document.getElementById("reviewPanel");
+  if (panel) {
+    panel.innerHTML = html;
+    panel.style.display = "block";
+  }
+}
+
+function saveState() {
+  const toSave = {
+    mode: state.mode, category: state.category, difficulty: state.difficulty,
+    isSeqMode: state.isSeqMode, seqIndex: state.seqIndex, errorList: state.errorList,
+    favorites: state.favorites, totalAnswered: state.totalAnswered,
+    rightAnswered: state.rightAnswered, wrongAnswered: state.wrongAnswered,
+    theme: state.theme, dailyGoal: state.dailyGoal, todayAnswered: state.todayAnswered,
+    todayCorrect: state.todayCorrect, todayDate: state.todayDate,
+    sm2Data: state.sm2Data, reviewMode: state.reviewMode,
+  };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      state.mode = saved.mode || "cn2en";
+      state.category = saved.category || "all";
+      state.difficulty = saved.difficulty || "all";
+      state.isSeqMode = saved.isSeqMode || false;
+      state.seqIndex = saved.seqIndex ?? -1;
+      state.errorList = saved.errorList || [];
+      state.favorites = saved.favorites || [];
+      state.totalAnswered = saved.totalAnswered || 0;
+      state.rightAnswered = saved.rightAnswered || 0;
+      state.wrongAnswered = saved.wrongAnswered || 0;
+      state.theme = saved.theme || "light";
+      state.dailyGoal = saved.dailyGoal || 30;
+      state.todayAnswered = saved.todayAnswered || 0;
+      state.todayCorrect = saved.todayCorrect || 0;
+      state.todayDate = saved.todayDate || "";
+      state.sm2Data = saved.sm2Data || {};
+      state.reviewMode = saved.reviewMode || false;
+    }
+  } catch(e) {}
+}
+
+function setTheme(theme) {
+  state.theme = theme;
+  document.documentElement.setAttribute("data-theme", theme);
+  document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+  const map = { light: 0, dark: 1, "eye-care": 2 };
+  document.querySelectorAll(".theme-btn")[map[theme]]?.classList.add("active");
+  saveState();
+}
+
+function getCatName(cat) {
+  const map = {
+    politics:"时政", tech:"科技", culture:"社会文化", campus:"校园",
+    medical:"医疗", economy:"经济", environment:"环保", writing:"写作", research:"科研"
+  };
+  return map[cat] || cat;
+}
+
+function getFilteredList() {
+  let list = wordList;
+  if (state.category !== "all") {
+    list = list.filter(w => w.cat === state.category);
+  }
+  if (state.difficulty !== "all") {
+    list = list.filter(w => w.difficulty === state.difficulty);
+  }
+  return list;
+}
+
+function setDifficulty(diff) {
+  state.difficulty = diff;
+  state.seqIndex = -1;
+  state.history = [];
+  state.historyIndex = -1;
+  hideRewriteArea();
+  updateDifficultyUI();
+  updateNavUI();
+  document.getElementById("question").innerText = "难度已切换，请抽题开始答题";
+  document.getElementById("resText").innerText = "";
+  document.getElementById("resText").className = "result";
+  document.getElementById("quizBox").className = "quiz-box";
+  document.getElementById("catTag").style.display = "none";
+  document.getElementById("diffTag").style.display = "none";
+  document.getElementById("userInput").value = "";
+  saveState();
+}
+
+function updateDifficultyUI() {
+  const btns = ["diffAllBtn", "diff1Btn", "diff2Btn", "diff3Btn"];
+  btns.forEach(id => {
+    document.getElementById(id).classList.remove("active");
+    document.getElementById(id).style.background = "";
+    document.getElementById(id).style.color = "";
+  });
+  const map = { all: 0, 1: 1, 2: 2, 3: 3 };
+  const idx = map[state.difficulty];
+  if (idx !== undefined) {
+    const btn = document.getElementById(btns[idx]);
+    btn.classList.add("active");
+    btn.style.background = "var(--primary)";
+    btn.style.color = "#fff";
+  }
+}
+
+function getDifficultyStars(diff) {
+  return "★".repeat(diff || 1);
+}
+
+// ==================== 模糊匹配 ====================
+function normalize(str) {
+  return str
+    .replace(/[\uFF01-\uFF5E]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0))
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^[.,!?;:'"\-，。！？；：'""'、]+|[.,!?;:'"\-，。！？；：'""'、]+$/g, "")
+    .toLowerCase();
+}
+
+function isFuzzyMatch(userAns, correctAns) {
+  const u = normalize(userAns);
+  const c = normalize(correctAns);
+  if (u === c) return true;
+
+  // 同义词/简写映射（双向）
+  const pairs = [
+    ["ai","人工智能"], ["人工智能","ai"],
+    ["脱贫，扶贫","脱贫"], ["脱贫，扶贫","扶贫"], ["脱贫","脱贫，扶贫"], ["扶贫","脱贫，扶贫"],
+    ["新能源，可再生能源","新能源"], ["新能源，可再生能源","可再生能源"],
+    ["新能源","新能源，可再生能源"], ["可再生能源","新能源，可再生能源"],
+    ["大语言模型","llm"], ["llm","大语言模型"],
+    ["虚拟现实","vr"], ["vr","虚拟现实"],
+    ["混合现实","mr"], ["mr","混合现实"],
+    ["增强现实","ar"], ["ar","增强现实"],
+    ["物联网","iot"], ["iot","物联网"],
+    ["简历","cv"], ["cv","简历"],
+    ["无人驾驶汽车","driverless car"], ["无人驾驶汽车","self-driving car"],
+    ["无人驾驶汽车","autonomous vehicle"],
+    ["辞职","resign"], ["resign","辞职"],
+    ["传统的","conventional"], ["conventional","传统的"],
+    ["象征","symbolize"], ["symbolize","象征"],
+    ["仪式","ritual"], ["ritual","仪式"],
+    ["大学","university"], ["university","大学"],
+    ["博士学位","phd"], ["phd","博士学位"],
+    ["导师","instructor"], ["instructor","导师"],
+    ["肥胖的","obese"], ["obese","肥胖的"],
+    ["高血压","hypertension"], ["hypertension","高血压"],
+    ["税","taxation"], ["taxation","税"],
+    ["健康","fitness"], ["fitness","健康"],
+    ["药物","medicine"], ["medicine","药物"],
+    ["调查","study"], ["study","调查"],
+    ["申请","request"], ["request","申请"],
+    ["论文，短文","essay"], ["essay","论文，短文"],
+    ["公告","announcement"], ["announcement","公告"],
+  ];
+  for (const [a, b] of pairs) {
+    if (normalize(a) === u && normalize(b) === c) return true;
+    if (normalize(a) === c && normalize(b) === u) return true;
+  }
+  return false;
+}
+
+// ==================== 同义词自动查找 ====================
+function getAlternatives(word) {
+  const sameCn = wordList.filter(w => w.cn === word.cn && w.en !== word.en);
+  return sameCn.map(w => w.en);
+}
+
+// ==================== 严格匹配（照打阶段用） ====================
+function isStrictMatch(userAns, correctAns) {
+  return normalize(userAns) === normalize(correctAns);
+}
+
+// ==================== UI 更新 ====================
+function updateStats() {
+  document.getElementById("totalCount").innerText = state.totalAnswered;
+  document.getElementById("rightCount").innerText = state.rightAnswered;
+  document.getElementById("wrongCount").innerText = state.wrongAnswered;
+  const rate = state.totalAnswered > 0
+    ? Math.round((state.rightAnswered / state.totalAnswered) * 100) : 0;
+  document.getElementById("rateText").innerText = rate + "%";
+  document.getElementById("errorCount").innerText = state.errorList.length;
+  document.getElementById("favoriteCount").innerText = state.favorites.length;
+  updateDailyGoalUI();
+}
+
+function updateDailyGoalUI() {
+  const today = new Date().toDateString();
+  if (state.todayDate !== today) {
+    state.todayDate = today;
+    state.todayAnswered = 0;
+    state.todayCorrect = 0;
+    saveState();
+  }
+  document.getElementById("goalProgress").innerText = state.todayAnswered;
+  document.getElementById("todayAnswered").innerText = state.todayAnswered;
+  document.getElementById("todayCorrect").innerText = state.todayCorrect;
+  const rate = state.todayAnswered > 0
+    ? Math.round((state.todayCorrect / state.todayAnswered) * 100) : 0;
+  document.getElementById("todayRate").innerText = rate + "%";
+  const progress = Math.min(100, (state.todayAnswered / state.dailyGoal) * 100);
+  document.getElementById("goalFill").style.width = progress + "%";
+  document.getElementById("dailyGoalInput").value = state.dailyGoal;
+}
+
+function updateDailyGoal() {
+  const input = document.getElementById("dailyGoalInput");
+  const goal = parseInt(input.value) || 30;
+  state.dailyGoal = Math.max(1, Math.min(200, goal));
+  input.value = state.dailyGoal;
+  updateDailyGoalUI();
+  saveState();
+}
+
+function speakWord() {
+  if (!state.currentWord) return;
+  const text = state.mode === "cn2en" ? state.currentWord.en : state.currentWord.cn;
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = state.mode === "cn2en" ? "en-US" : "zh-CN";
+    utterance.rate = 0.9;
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
+function toggleExample() {
+  if (!state.currentWord) return;
+  state.showExample = !state.showExample;
+  const exampleText = document.getElementById("exampleText");
+  const exampleBtn = document.getElementById("exampleBtn");
+  if (state.showExample && state.currentWord.example) {
+    exampleText.innerText = "例句：" + state.currentWord.example;
+    exampleText.style.display = "block";
+    exampleBtn.classList.add("active");
+    exampleBtn.style.background = "var(--primary)";
+    exampleBtn.style.color = "#fff";
+  } else {
+    exampleText.style.display = "none";
+    exampleBtn.classList.remove("active");
+    exampleBtn.style.background = "";
+    exampleBtn.style.color = "";
+  }
+}
+
+function toggleFavorite() {
+  if (!state.currentWord) return;
+  const existIdx = state.favorites.findIndex(
+    f => f.en === state.currentWord.en && f.cn === state.currentWord.cn
+  );
+  const favBtn = document.getElementById("favBtn");
+  if (existIdx >= 0) {
+    state.favorites.splice(existIdx, 1);
+    favBtn.innerText = "☆";
+    favBtn.classList.remove("active");
+    favBtn.style.background = "";
+    favBtn.style.color = "";
+  } else {
+    state.favorites.push({
+      en: state.currentWord.en,
+      cn: state.currentWord.cn,
+      cat: state.currentWord.cat,
+      note: state.currentWord.note || "",
+      difficulty: state.currentWord.difficulty || 1,
+      example: state.currentWord.example || ""
+    });
+    favBtn.innerText = "★";
+    favBtn.classList.add("active");
+    favBtn.style.background = "#ffc107";
+    favBtn.style.color = "#fff";
+  }
+  updateStats();
+  renderFavoritePanel();
+  saveState();
+}
+
+function updateFavBtnState() {
+  if (!state.currentWord) return;
+  const existIdx = state.favorites.findIndex(
+    f => f.en === state.currentWord.en && f.cn === state.currentWord.cn
+  );
+  const favBtn = document.getElementById("favBtn");
+  if (existIdx >= 0) {
+    favBtn.innerText = "★";
+    favBtn.classList.add("active");
+    favBtn.style.background = "#ffc107";
+    favBtn.style.color = "#fff";
+  } else {
+    favBtn.innerText = "☆";
+    favBtn.classList.remove("active");
+    favBtn.style.background = "";
+    favBtn.style.color = "";
+  }
+}
+
+function renderFavoritePanel() {
+  const body = document.getElementById("favoriteBody");
+  if (state.favorites.length === 0) {
+    body.innerHTML = '<div class="empty-state">暂无收藏，点击 ☆ 收藏单词</div>';
+    return;
+  }
+  body.innerHTML = state.favorites.map((item, i) => `
+    <div class="favorite-item">
+      <div class="word-pair">
+        <span class="en">${item.en}</span>
+        <span class="cn">${item.cn}</span>
+        <span style="font-size:11px;color:#ffc107">${getDifficultyStars(item.difficulty)}</span>
+        ${item.note ? `<span style="font-size:12px;color:var(--text-secondary)">(${item.note})</span>` : ""}
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="studyFavoriteItem(${i})">学习</button>
+      <button class="btn btn-danger btn-sm" onclick="removeFavoriteItem(${i})">删除</button>
+    </div>
+  `).join("");
+}
+
+function studyFavoriteItem(index) {
+  state.currentWord = state.favorites[index];
+  state.history.push(state.currentWord);
+  state.historyIndex = state.history.length - 1;
+  showQuestion(state.currentWord);
+  document.getElementById("question").innerText =
+    "【收藏学习】" + (state.mode === "cn2en" ? "中文：" + state.currentWord.cn : "英文：" + state.currentWord.en);
+}
+
+function removeFavoriteItem(index) {
+  state.favorites.splice(index, 1);
+  renderFavoritePanel();
+  document.getElementById("favoriteCount").innerText = state.favorites.length;
+  saveState();
+}
+
+function toggleFavoritePanel() {
+  document.getElementById("favoritePanel").classList.toggle("open");
+}
+
+function updateCategoryUI() {
+  document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+  const cats = ["all","politics","tech","culture","campus","medical","economy","environment","writing","research"];
+  const idx = cats.indexOf(state.category);
+  if (idx >= 0) document.querySelectorAll(".cat-btn")[idx]?.classList.add("active");
+}
+
+function updateModeUI() {
+  document.getElementById("modeText").innerText = state.mode === "cn2en" ? "中译英" : "英译中";
+  const seqBtn = document.getElementById("modeSeqBtn");
+  const randBtn = document.getElementById("modeRandBtn");
+  if (state.isSeqMode) {
+    seqBtn.classList.add("active"); seqBtn.style.background = "var(--primary)"; seqBtn.style.color = "#fff";
+    randBtn.classList.remove("active"); randBtn.style.background = ""; randBtn.style.color = "";
+  } else {
+    randBtn.classList.add("active"); randBtn.style.background = "var(--primary)"; randBtn.style.color = "#fff";
+    seqBtn.classList.remove("active"); seqBtn.style.background = ""; seqBtn.style.color = "";
+  }
+}
+
+function updateNavUI() {
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const navInfo = document.getElementById("navInfo");
+  if (state.isSeqMode) {
+    const list = getFilteredList();
+    const total = list.length;
+    prevBtn.disabled = state.seqIndex <= 0;
+    nextBtn.disabled = state.seqIndex >= total - 1 || total === 0;
+    navInfo.innerText = total > 0 ? `${state.seqIndex + 1} / ${total}` : "0 / 0";
+  } else {
+    prevBtn.disabled = state.historyIndex <= 0;
+    nextBtn.disabled = state.historyIndex >= state.history.length - 1;
+    navInfo.innerText = "";
+  }
+}
+
+function renderErrorPanel() {
+  const body = document.getElementById("errorBody");
+  if (state.errorList.length === 0) {
+    body.innerHTML = '<div class="empty-state">暂无错题，继续加油！🎉</div>';
+    return;
+  }
+  body.innerHTML = state.errorList.map((item, i) => `
+    <div class="error-item">
+      <div class="word-pair">
+        <span class="en">${item.en}</span>
+        <span class="cn">${item.cn}</span>
+        ${item.note ? `<span style="font-size:12px;color:var(--text-secondary)">(${item.note})</span>` : ""}
+      </div>
+      <span class="error-count">错${item.count || 1}次</span>
+      <button class="btn btn-warning btn-sm" onclick="redoErrorItem(${i})">重做</button>
+      <button class="btn btn-danger btn-sm" onclick="removeErrorItem(${i})">删除</button>
+    </div>
+  `).join("");
+}
+
+// ==================== 照打正确答案区域 ====================
+function showRewriteArea(correctAns) {
+  state.rewritePhase = true;
+  state.rewriteCorrectAns = correctAns;
+  document.getElementById("answerRow").style.display = "none";
+  document.getElementById("submitBtn").style.display = "none";
+
+  const area = document.getElementById("rewriteArea");
+  area.style.display = "block";
+  area.innerHTML = `
+    <div class="rewrite-box">
+      <div class="rewrite-title">✍️ 请照着打一遍正确答案，加深记忆：</div>
+      <div class="rewrite-target">${correctAns}</div>
+      <div class="rewrite-input-row">
+        <input type="text" id="rewriteInput" placeholder="在此输入上面的正确答案" autocomplete="off">
+        <button class="btn btn-success" id="rewriteConfirmBtn" onclick="confirmRewrite()">确认</button>
+      </div>
+      <div class="rewrite-feedback" id="rewriteFeedback"></div>
+    </div>
+  `;
+
+  // 实时对比输入
+  const ri = document.getElementById("rewriteInput");
+  ri.addEventListener("input", onRewriteInput);
+  ri.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") { e.preventDefault(); confirmRewrite(); }
+  });
+  setTimeout(() => ri.focus(), 100);
+}
+
+function onRewriteInput() {
+  const input = document.getElementById("rewriteInput");
+  const feedback = document.getElementById("rewriteFeedback");
+  if (!input) return;
+
+  if (isStrictMatch(input.value, state.rewriteCorrectAns)) {
+    input.className = "match";
+    feedback.innerHTML = '<span style="color:var(--success)">✅ 完全正确！点击确认或按回车继续</span>';
+  } else if (input.value.length >= state.rewriteCorrectAns.length) {
+    input.className = "mismatch";
+    feedback.innerHTML = '<span style="color:var(--error)">❌ 还没有完全一致，请仔细对照</span>';
+  } else {
+    input.className = "";
+    feedback.innerText = "";
+  }
+}
+
+function confirmRewrite() {
+  if (!state.rewritePhase) return;
+  const input = document.getElementById("rewriteInput");
+  if (!input) return;
+
+  if (!isStrictMatch(input.value, state.rewriteCorrectAns)) {
+    input.className = "mismatch";
+    document.getElementById("rewriteFeedback").innerHTML =
+      '<span style="color:var(--error)">❌ 请确保输入与正确答案完全一致！注意大小写和标点</span>';
+    input.focus();
+    return;
+  }
+
+  // 照打成功，进入下一题
+  hideRewriteArea();
+  goNextQuestion();
+}
+
+function hideRewriteArea() {
+  state.rewritePhase = false;
+  document.getElementById("rewriteArea").style.display = "none";
+  document.getElementById("rewriteArea").innerHTML = "";
+  document.getElementById("answerRow").style.display = "";
+  document.getElementById("submitBtn").style.display = "";
+  state.isSubmitting = false;
+  document.getElementById("submitBtn").disabled = false;
+}
+
+function goNextQuestion() {
+  if (state.isSeqMode) {
+    const list = getFilteredList();
+    if (state.seqIndex < list.length - 1) {
+      nextQuestion();
+    } else {
+      document.getElementById("question").innerText = "🎉 已完成该分类全部题目！";
+      document.getElementById("catTag").style.display = "none";
+    }
+  } else {
+    getQuestion();
+  }
+}
+
+// ==================== 核心逻辑 ====================
+function showQuestion(word) {
+  if (!word) return;
+  state.currentWord = word;
+  state.answerStartTime = Date.now();
+  const qDom = document.getElementById("question");
+  const catTag = document.getElementById("catTag");
+  const diffTag = document.getElementById("diffTag");
+  const resDom = document.getElementById("resText");
+  const inputDom = document.getElementById("userInput");
+  const quizBox = document.getElementById("quizBox");
+  const exampleText = document.getElementById("exampleText");
+
+  hideRewriteArea();
+  inputDom.value = "";
+  resDom.innerText = "";
+  resDom.className = "result";
+  quizBox.className = "quiz-box";
+  document.getElementById("answerRow").style.display = "";
+  document.getElementById("submitBtn").style.display = "";
+  state.isSubmitting = false;
+  document.getElementById("submitBtn").disabled = false;
+  exampleText.style.display = "none";
+  state.showExample = false;
+  document.getElementById("exampleBtn").classList.remove("active");
+  document.getElementById("exampleBtn").style.background = "";
+  document.getElementById("exampleBtn").style.color = "";
+
+  catTag.style.display = "inline-block";
+  catTag.innerText = getCatName(word.cat);
+
+  if (word.difficulty) {
+    diffTag.style.display = "inline-block";
+    diffTag.innerText = getDifficultyStars(word.difficulty);
+  } else {
+    diffTag.style.display = "none";
+  }
+
+  if (state.mode === "cn2en") {
+    qDom.innerText = "中文：" + word.cn;
+  } else {
+    qDom.innerText = "英文：" + word.en;
+  }
+
+  updateFavBtnState();
+  inputDom.focus();
+  updateNavUI();
+  saveState();
+}
+
+function getQuestion() {
+  if (state.reviewMode) { getSmartQuestion(); return; }
+  const list = getFilteredList();
+  if (list.length === 0) { alert("该分类暂无词汇！"); return; }
+
+  if (state.isSeqMode) {
+    if (state.seqIndex < 0 || state.seqIndex >= list.length) state.seqIndex = 0;
+    state.currentWord = list[state.seqIndex];
+  } else {
+    const idx = Math.floor(Math.random() * list.length);
+    state.currentWord = list[idx];
+    state.seqIndex = list.indexOf(state.currentWord);
+  }
+
+  if (state.historyIndex < state.history.length - 1) {
+    state.history = state.history.slice(0, state.historyIndex + 1);
+  }
+  state.history.push(state.currentWord);
+  state.historyIndex = state.history.length - 1;
+
+  showQuestion(state.currentWord);
+}
+
+function prevQuestion() {
+  if (state.rewritePhase) return;
+  if (state.isSeqMode) {
+    const list = getFilteredList();
+    if (state.seqIndex > 0) { state.seqIndex--; state.currentWord = list[state.seqIndex]; showQuestion(state.currentWord); }
+  } else {
+    if (state.historyIndex > 0) { state.historyIndex--; state.currentWord = state.history[state.historyIndex]; showQuestion(state.currentWord); }
+  }
+}
+
+function nextQuestion() {
+  if (state.rewritePhase) return;
+  if (state.isSeqMode) {
+    const list = getFilteredList();
+    if (state.seqIndex < list.length - 1) { state.seqIndex++; state.currentWord = list[state.seqIndex]; showQuestion(state.currentWord); }
+  } else {
+    if (state.historyIndex < state.history.length - 1) { state.historyIndex++; state.currentWord = state.history[state.historyIndex]; showQuestion(state.currentWord); }
+  }
+}
+
+function checkAnswer() {
+  if (state.isSubmitting) return;
+  if (state.rewritePhase) return;
+  if (!state.currentWord) {
+    document.getElementById("resText").innerText = "请先抽题！";
+    document.getElementById("resText").className = "result show";
+    return;
+  }
+
+  state.isSubmitting = true;
+  document.getElementById("submitBtn").disabled = true;
+
+  const userAns = document.getElementById("userInput").value;
+  const resDom = document.getElementById("resText");
+  const quizBox = document.getElementById("quizBox");
+  let correctAns, isCorrect = false;
+
+  if (state.mode === "cn2en") {
+    correctAns = state.currentWord.en;
+    isCorrect = isFuzzyMatch(userAns, correctAns);
+    if (!isCorrect) {
+      const alternatives = getAlternatives(state.currentWord);
+      isCorrect = alternatives.some(alt => isFuzzyMatch(userAns, alt));
+    }
+  } else {
+    correctAns = state.currentWord.cn;
+    isCorrect = isFuzzyMatch(userAns, correctAns);
+  }
+
+  state.totalAnswered++;
+  state.todayAnswered++;
+  const timeSpent = Date.now() - state.answerStartTime;
+  resDom.className = "result show";
+
+  if (isCorrect) {
+    state.rightAnswered++;
+    state.todayCorrect++;
+    resDom.classList.add("right");
+    quizBox.className = "quiz-box correct";
+    playSound('correct');
+    const praise = ["🎉 回答正确，太棒啦！", "✅ 完全正确，继续加油！", "👍 记得很牢，真不错！", "💪 很厉害！"];
+    resDom.innerText = praise[Math.floor(Math.random() * praise.length)];
+    if (state.currentWord.note) {
+      resDom.innerHTML += `<div class="paraphrase">💡 释义：${state.currentWord.note}</div>`;
+    }
+    if (state.mode === "cn2en") {
+      const alternatives = getAlternatives(state.currentWord);
+      if (alternatives.length > 0) {
+        resDom.innerHTML += `<div class="paraphrase">💡 也可接受：${alternatives.join(', ')}</div>`;
+      }
+    }
+
+    // SM-2: 答对，根据回忆速度评分 (3-5)
+    let quality = timeSpent < 2000 ? 5 : timeSpent < 5000 ? 4 : 3;
+    const wordKey = getWordKey(state.currentWord);
+    const beforeData = getSm2Data(wordKey);
+    const beforeRep = beforeData ? beforeData.repetition : 0;
+    sm2(wordKey, quality);
+    const afterData = getSm2Data(wordKey);
+    if (afterData && afterData.repetition > beforeRep && afterData.repetition <= 5) {
+      resDom.innerHTML += `<div class="paraphrase">📈 连续正确 ${afterData.repetition} 次，间隔 ${afterData.interval} 天</div>`;
+    }
+
+    updateStats();
+    renderErrorPanel();
+    saveState();
+
+    setTimeout(() => {
+      document.getElementById("userInput").value = "";
+      state.isSubmitting = false;
+      document.getElementById("submitBtn").disabled = false;
+      goNextQuestion();
+    }, 1200);
+
+  } else {
+    state.wrongAnswered++;
+    resDom.classList.add("wrong");
+    quizBox.className = "quiz-box incorrect";
+    playSound('wrong');
+    let msg = `❌ 答错啦，正确答案是：<strong>${correctAns}</strong>`;
+    if (state.currentWord.note) {
+      msg += `<div class="paraphrase">💡 释义：${state.currentWord.note}</div>`;
+    }
+    if (state.mode === "cn2en") {
+      const alternatives = getAlternatives(state.currentWord);
+      if (alternatives.length > 0) {
+        msg += `<div class="paraphrase">💡 也可接受：${alternatives.join(', ')}</div>`;
+      }
+    }
+    resDom.innerHTML = msg;
+
+    // SM-2: 答错，重置间隔
+    const wordKey = getWordKey(state.currentWord);
+    sm2(wordKey, 0);
+    resDom.innerHTML += `<div class="paraphrase">🔄 已重置复习间隔，1天后复习</div>`;
+
+    // 加入错题本
+    const existIdx = state.errorList.findIndex(
+      e => e.en === state.currentWord.en && e.cn === state.currentWord.cn
+    );
+    if (existIdx >= 0) {
+      state.errorList[existIdx].count = (state.errorList[existIdx].count || 1) + 1;
+    } else {
+      state.errorList.push({ en: state.currentWord.en, cn: state.currentWord.cn, cat: state.currentWord.cat, note: state.currentWord.note || "", difficulty: state.currentWord.difficulty || 1, example: state.currentWord.example || "", count: 1 });
+    }
+
+    updateStats();
+    renderErrorPanel();
+    saveState();
+
+    // 清空输入框，显示照打区域
+    document.getElementById("userInput").value = "";
+    setTimeout(() => {
+      showRewriteArea(correctAns);
+    }, 600);
+  }
+}
+
+// ==================== 事件 ====================
+document.getElementById("userInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter" && !state.rewritePhase) {
+    e.preventDefault();
+    checkAnswer();
+  }
+});
+
+// 键盘快捷键
+document.addEventListener("keydown", function(e) {
+  // 如果在输入框中，不处理快捷键（除了Esc）
+  if (document.activeElement.tagName === "INPUT" && e.key !== "Escape") {
+    return;
+  }
+  
+  switch(e.key) {
+    case "Escape":
+      // 清空输入框
+      document.getElementById("userInput").value = "";
+      if (state.rewritePhase) {
+        hideRewriteArea();
+      }
+      break;
+    case "ArrowLeft":
+      // 上一题
+      if (!state.rewritePhase) prevQuestion();
+      break;
+    case "ArrowRight":
+      // 下一题
+      if (!state.rewritePhase) nextQuestion();
+      break;
+    case " ":
+      // 随机抽题（空格键）
+      if (!state.rewritePhase && document.activeElement.tagName !== "INPUT") {
+        e.preventDefault();
+        getQuestion();
+      }
+      break;
+    case "s":
+    case "S":
+      // 发音
+      if (!state.rewritePhase && document.activeElement.tagName !== "INPUT") {
+        speakWord();
+      }
+      break;
+    case "f":
+    case "F":
+      // 收藏
+      if (!state.rewritePhase && document.activeElement.tagName !== "INPUT") {
+        toggleFavorite();
+      }
+      break;
+    case "r":
+    case "R":
+      // 复习进度
+      if (!state.rewritePhase && document.activeElement.tagName !== "INPUT") {
+        const rp = document.getElementById("reviewPanel");
+        if (rp.style.display === "none" || !rp.style.display) {
+          showReviewPanel();
+        } else {
+          rp.style.display = "none";
+        }
+      }
+      break;
+  }
+});
+
+// 系统主题自动切换
+if (window.matchMedia) {
+  const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  darkModeMediaQuery.addEventListener('change', function(e) {
+    if (!localStorage.getItem(STORAGE_KEY) || !JSON.parse(localStorage.getItem(STORAGE_KEY)).theme) {
+      setTheme(e.matches ? 'dark' : 'light');
+    }
+  });
+}
+
+// 音效系统
+let audioContext = null;
+function initAudio() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+}
+function playSound(type) {
+  try {
+    initAudio();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    gainNode.gain.value = 0.3;
+    
+    if (type === 'correct') {
+      oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+      oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+      oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.4);
+    } else if (type === 'wrong') {
+      oscillator.frequency.setValueAtTime(311.13, audioContext.currentTime); // Eb4
+      oscillator.frequency.setValueAtTime(293.66, audioContext.currentTime + 0.15); // D4
+      oscillator.type = 'sawtooth';
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    } else if (type === 'click') {
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.05);
+    }
+  } catch(e) {}
+}
+
+// ==================== 分类 & 模式切换 ====================
+function setCategory(cat) {
+  state.category = cat;
+  state.seqIndex = -1;
+  state.history = [];
+  state.historyIndex = -1;
+  hideRewriteArea();
+  updateCategoryUI();
+  updateNavUI();
+  document.getElementById("question").innerText = "分类已切换，请抽题开始答题";
+  document.getElementById("resText").innerText = "";
+  document.getElementById("resText").className = "result";
+  document.getElementById("quizBox").className = "quiz-box";
+  document.getElementById("catTag").style.display = "none";
+  document.getElementById("userInput").value = "";
+  saveState();
+}
+
+function switchMode(mode) {
+  state.mode = mode;
+  hideRewriteArea();
+  updateModeUI();
+  document.getElementById("question").innerText = "模式已切换，请抽题开始答题";
+  document.getElementById("resText").innerText = "";
+  document.getElementById("resText").className = "result";
+  document.getElementById("quizBox").className = "quiz-box";
+  document.getElementById("userInput").value = "";
+  saveState();
+}
+
+function toggleSeqMode() {
+  state.isSeqMode = !state.isSeqMode;
+  state.seqIndex = -1;
+  state.history = [];
+  state.historyIndex = -1;
+  hideRewriteArea();
+  updateModeUI();
+  updateNavUI();
+  document.getElementById("question").innerText = state.isSeqMode ? "已切换为顺序刷题，请抽题" : "已切换为随机刷题，请抽题";
+  document.getElementById("resText").innerText = "";
+  document.getElementById("resText").className = "result";
+  document.getElementById("quizBox").className = "quiz-box";
+  document.getElementById("catTag").style.display = "none";
+  saveState();
+}
+
+// ==================== 错题本 ====================
+function redoError() {
+  if (state.errorList.length === 0) {
+    document.getElementById("resText").innerText = "暂无错题！";
+    document.getElementById("resText").className = "result show";
+    return;
+  }
+  const idx = Math.floor(Math.random() * state.errorList.length);
+  state.currentWord = state.errorList[idx];
+  state.history.push(state.currentWord);
+  state.historyIndex = state.history.length - 1;
+  showQuestion(state.currentWord);
+  document.getElementById("question").innerText =
+    "【错题重做】" + (state.mode === "cn2en" ? "中文：" + state.currentWord.cn : "英文：" + state.currentWord.en);
+}
+
+function redoErrorItem(index) {
+  state.currentWord = state.errorList[index];
+  state.history.push(state.currentWord);
+  state.historyIndex = state.history.length - 1;
+  showQuestion(state.currentWord);
+  document.getElementById("question").innerText =
+    "【错题重做】" + (state.mode === "cn2en" ? "中文：" + state.currentWord.cn : "英文：" + state.currentWord.en);
+}
+
+function removeErrorItem(index) {
+  state.errorList.splice(index, 1);
+  renderErrorPanel();
+  document.getElementById("errorCount").innerText = state.errorList.length;
+  saveState();
+}
+
+function clearErrors() {
+  state.errorList = [];
+  document.getElementById("errorCount").innerText = "0";
+  renderErrorPanel();
+  document.getElementById("resText").innerText = "错题本已清空！";
+  document.getElementById("resText").className = "result show";
+  saveState();
+}
+
+function exportErrors() {
+  if (state.errorList.length === 0) {
+    alert("错题本为空，无需导出！");
+    return;
+  }
+  const data = JSON.stringify(state.errorList, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cet4_errors_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importErrors(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported)) {
+        const count = imported.length;
+        state.errorList = [...state.errorList, ...imported];
+        renderErrorPanel();
+        document.getElementById("errorCount").innerText = state.errorList.length;
+        saveState();
+        alert(`成功导入 ${count} 道错题！`);
+      } else {
+        alert("文件格式错误！");
+      }
+    } catch(err) {
+      alert("导入失败：" + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function exportFavorites() {
+  if (state.favorites.length === 0) {
+    alert("收藏夹为空，无需导出！");
+    return;
+  }
+  const data = JSON.stringify(state.favorites, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cet4_favorites_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importFavorites(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported)) {
+        const count = imported.length;
+        state.favorites = [...state.favorites, ...imported];
+        renderFavoritePanel();
+        document.getElementById("favoriteCount").innerText = state.favorites.length;
+        saveState();
+        alert(`成功导入 ${count} 个收藏单词！`);
+      } else {
+        alert("文件格式错误！");
+      }
+    } catch(err) {
+      alert("导入失败：" + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function toggleErrorPanel() {
+  document.getElementById("errorPanel").classList.toggle("open");
+}
+
+function init() {
+  loadState();
+  setTheme(state.theme);
+  updateStats();
+  updateCategoryUI();
+  updateModeUI();
+  updateDifficultyUI();
+  updateNavUI();
+  renderErrorPanel();
+  renderFavoritePanel();
+  updateReviewModeUI();
+  
+  // 检查每日日期，重置今日统计
+  const today = new Date().toDateString();
+  if (state.todayDate !== today) {
+    state.todayDate = today;
+    state.todayAnswered = 0;
+    state.todayCorrect = 0;
+    saveState();
+  }
+}
+init();
+
+// 注册 Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('sw.js')
+      .then(function(registration) {
+        console.log('ServiceWorker registered:', registration.scope);
+      })
+      .catch(function(err) {
+        console.log('ServiceWorker registration failed:', err);
+      });
+  });
+}
+</script>
+</body>
+</html>
