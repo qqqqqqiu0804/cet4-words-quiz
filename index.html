@@ -377,6 +377,34 @@ kbd { padding: 2px 6px; background: var(--hover-bg); border: 1px solid var(--bor
 .version-item .tag-fix { color: var(--warning); font-weight: 600; }
 .version-item .tag-improve { color: var(--primary); font-weight: 600; }
 
+.heatmap-panel { margin-top: 20px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--card); }
+.heatmap-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: var(--hover-bg); cursor: pointer; user-select: none; }
+.heatmap-header h2 { font-size: 16px; color: var(--text); margin: 0; }
+.heatmap-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; padding: 0 18px; }
+.heatmap-panel.open .heatmap-body { max-height: 300px; overflow-y: auto; padding: 14px 18px; }
+.heatmap-panel.open .heatmap-header .arrow { transform: rotate(180deg); }
+.heatmap-container { overflow-x: auto; padding-bottom: 8px; }
+.heatmap-grid { display: inline-flex; flex-direction: column; gap: 2px; font-size: 11px; color: var(--text-secondary); }
+.heatmap-months { display: flex; gap: 2px; margin-left: 30px; margin-bottom: 4px; }
+.heatmap-months span { font-size: 11px; min-width: 36px; }
+.heatmap-row { display: flex; align-items: center; gap: 2px; }
+.heatmap-label { width: 26px; text-align: right; font-size: 10px; flex-shrink: 0; }
+.heatmap-cell { width: 12px; height: 12px; border-radius: 2px; background: var(--hover-bg); cursor: pointer; position: relative; }
+.heatmap-cell:hover { outline: 1px solid var(--text-secondary); }
+.heatmap-cell[data-count="0"] { background: var(--hover-bg); }
+.heatmap-cell[data-level="1"] { background: #9be9a8; }
+.heatmap-cell[data-level="2"] { background: #40c463; }
+.heatmap-cell[data-level="3"] { background: #30a14e; }
+.heatmap-cell[data-level="4"] { background: #216e39; }
+[data-theme="dark"] .heatmap-cell[data-level="1"] { background: #0e4429; }
+[data-theme="dark"] .heatmap-cell[data-level="2"] { background: #006d32; }
+[data-theme="dark"] .heatmap-cell[data-level="3"] { background: #26a641; }
+[data-theme="dark"] .heatmap-cell[data-level="4"] { background: #39d353; }
+.heatmap-tooltip { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--card); padding: 4px 8px; border-radius: 4px; font-size: 11px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .2s; z-index: 10; }
+.heatmap-cell:hover .heatmap-tooltip { opacity: 1; }
+.heatmap-legend { display: flex; align-items: center; gap: 4px; margin-top: 10px; font-size: 11px; color: var(--text-secondary); justify-content: flex-end; }
+.heatmap-legend .heatmap-cell { cursor: default; }
+
 @media (max-width: 600px) {
   .version-popup { width: calc(100vw - 32px); right: 16px; bottom: 70px; }
 }
@@ -386,7 +414,7 @@ kbd { padding: 2px 6px; background: var(--hover-bg); border: 1px solid var(--bor
 
 <div class="container">
   <div class="header">
-    <h1>📖 大学英语四级高频词 智能自测 <span style="font-size:12px;color:var(--text-secondary);font-weight:400;vertical-align:super;">v2.1</span></h1>
+    <h1>📖 大学英语四级高频词 智能自测 <span style="font-size:12px;color:var(--text-secondary);font-weight:400;vertical-align:super;">v2.2</span></h1>
     <div class="header-actions">
       <button class="theme-btn active" onclick="setTheme('light')">☀ 日间</button>
       <button class="theme-btn" onclick="setTheme('dark')">🌙 夜间</button>
@@ -504,6 +532,14 @@ kbd { padding: 2px 6px; background: var(--hover-bg); border: 1px solid var(--bor
       <span>正确：<span id="todayCorrect">0</span></span>
       <span>正确率：<span id="todayRate">0%</span></span>
     </div>
+  </div>
+
+  <div class="heatmap-panel" id="heatmapPanel">
+    <div class="heatmap-header" onclick="toggleHeatmapPanel()">
+      <h2>📅 学习热力图</h2>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="heatmap-body" id="heatmapBody"></div>
   </div>
 
   <div class="tools-panel">
@@ -901,6 +937,7 @@ let state = {
   sm2Data: {},
   // 智能复习模式
   reviewMode: false,
+  dailyHistory: {},
 };
 
 // ==================== SM-2 间隔重复算法 ====================
@@ -1076,6 +1113,7 @@ function saveState() {
     todayCorrect: state.todayCorrect, todayDate: state.todayDate,
     sm2Data: state.sm2Data, reviewMode: state.reviewMode,
     fontSize: state.fontSize, streak: state.streak, lastPracticeDate: state.lastPracticeDate,
+    dailyHistory: state.dailyHistory,
   };
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); } catch(e) {}
 }
@@ -1105,6 +1143,7 @@ function loadState() {
       state.fontSize = saved.fontSize || "medium";
       state.streak = saved.streak || 0;
       state.lastPracticeDate = saved.lastPracticeDate || "";
+      state.dailyHistory = saved.dailyHistory || {};
     }
   } catch(e) {}
 }
@@ -1673,6 +1712,8 @@ function checkAnswer() {
   state.totalAnswered++;
   state.todayAnswered++;
   updateStreak();
+  const todayKey = new Date().toISOString().slice(0, 10);
+  state.dailyHistory[todayKey] = (state.dailyHistory[todayKey] || 0) + 1;
   const timeSpent = Date.now() - state.answerStartTime;
   resDom.className = "result show";
 
@@ -2058,6 +2099,63 @@ function toggleErrorPanel() {
   document.getElementById("errorPanel").classList.toggle("open");
 }
 
+function toggleHeatmapPanel() {
+  var panel = document.getElementById('heatmapPanel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) renderHeatmap();
+}
+
+function renderHeatmap() {
+  var container = document.getElementById('heatmapBody');
+  var today = new Date();
+  var days = 365;
+  var startDate = new Date(today);
+  startDate.setDate(startDate.getDate() - days + 1);
+  var startDow = startDate.getDay();
+  var totalWeeks = Math.ceil((days + startDow) / 7);
+  var monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  var dayLabels = ['日','一','二','三','四','五','六'];
+  var monthRow = '<div class="heatmap-months">';
+  var lastMonth = -1;
+  for (var w = 0; w < totalWeeks; w++) {
+    var realD = new Date(startDate);
+    realD.setDate(realD.getDate() + w * 7);
+    var m = realD.getMonth();
+    if (m !== lastMonth) {
+      monthRow += '<span>' + monthNames[m] + '</span>';
+      lastMonth = m;
+    } else {
+      monthRow += '<span></span>';
+    }
+  }
+  monthRow += '</div>';
+  var html = '<div class="heatmap-grid">' + monthRow;
+  for (var dow = 0; dow < 7; dow++) {
+    html += '<div class="heatmap-row">';
+    if (dow % 2 === 1) html += '<span class="heatmap-label">' + dayLabels[dow] + '</span>';
+    else html += '<span class="heatmap-label"></span>';
+    for (var w = 0; w < totalWeeks; w++) {
+      var dayOffset = w * 7 + dow - startDow;
+      var cellDate = new Date(startDate);
+      cellDate.setDate(cellDate.getDate() + dayOffset);
+      if (cellDate > today) { html += '<span class="heatmap-cell" style="visibility:hidden"></span>'; continue; }
+      var key = cellDate.toISOString().slice(0,10);
+      var count = (state.dailyHistory && state.dailyHistory[key]) || 0;
+      var level = 0;
+      if (count >= 31) level = 4;
+      else if (count >= 21) level = 3;
+      else if (count >= 11) level = 2;
+      else if (count >= 1) level = 1;
+      var dayStr = (cellDate.getMonth()+1) + '月' + cellDate.getDate() + '日';
+      html += '<span class="heatmap-cell" data-count="' + count + '" data-level="' + level + '"><span class="heatmap-tooltip">' + dayStr + '：' + count + '词</span></span>';
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<div class="heatmap-legend">少 <span class="heatmap-cell" data-count="0"></span><span class="heatmap-cell" data-level="1"></span><span class="heatmap-cell" data-level="2"></span><span class="heatmap-cell" data-level="3"></span><span class="heatmap-cell" data-level="4"></span> 多</div>';
+  container.innerHTML = html;
+}
+
 function setFontSize(size) {
   state.fontSize = size;
   const scales = { small: 0.88, medium: 1, large: 1.15 };
@@ -2098,7 +2196,9 @@ function init() {
   renderErrorPanel();
   renderFavoritePanel();
   updateReviewModeUI();
-  
+  var todayKey = new Date().toISOString().slice(0, 10);
+  state.dailyHistory[todayKey] = state.todayAnswered || 0;
+
   // 检查每日日期，重置今日统计
   if (state.todayDate !== today) {
     state.todayDate = today;
@@ -2124,13 +2224,23 @@ if ('serviceWorker' in navigator) {
 </script>
 
 <!-- 版本号悬浮球 -->
-<div class="version-badge" id="versionBadge" onclick="toggleVersionPopup()">v2.1</div>
+<div class="version-badge" id="versionBadge" onclick="toggleVersionPopup()">v2.2</div>
 <div class="version-popup" id="versionPopup">
   <div class="version-popup-header">
     <h3>📋 更新日志</h3>
     <button class="version-popup-close" onclick="toggleVersionPopup()">&times;</button>
   </div>
   <div class="version-list">
+    <div class="version-item">
+      <div class="version-item-header">
+        <span class="version-tag">v2.2</span>
+        <span class="version-date">2026-06-14</span>
+      </div>
+      <ul>
+        <li><span class="tag-new">[新功能]</span> GitHub 风格学习热力图，展示 365 天练习记录</li>
+        <li><span class="tag-new">[新功能]</span> 热力图支持悬停查看每日学习详情</li>
+      </ul>
+    </div>
     <div class="version-item">
       <div class="version-item-header">
         <span class="version-tag">v2.1</span>
