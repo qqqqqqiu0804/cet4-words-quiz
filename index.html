@@ -120,6 +120,16 @@ body {
 .stat-card.right .num { color: var(--success); }
 .stat-card.wrong .num { color: var(--error); }
 .stat-card.rate .num { color: var(--warning); }
+.stat-card.streak .num { color: #f56c6c; }
+.font-controls { display: flex; gap: 4px; align-items: center; }
+.font-btn {
+  padding: 4px 10px; font-size: 12px; border-radius: 14px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--text-secondary); cursor: pointer; transition: all var(--transition);
+}
+.font-btn:hover { border-color: var(--primary); color: var(--primary); }
+.font-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.font-label { font-size: 12px; color: var(--text-secondary); margin-right: 2px; }
 
 .cat-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
 .cat-bar > span { font-size: 13px; color: var(--text-secondary); margin-right: 4px; white-space: nowrap; }
@@ -320,11 +330,19 @@ kbd { padding: 2px 6px; background: var(--hover-bg); border: 1px solid var(--bor
 
 <div class="container">
   <div class="header">
-    <h1>📖 大学英语四级高频词 智能自测</h1>
+    <h1>📖 大学英语四级高频词 智能自测 <span style="font-size:12px;color:var(--text-secondary);font-weight:400;vertical-align:super;">v2.1</span></h1>
     <div class="header-actions">
       <button class="theme-btn active" onclick="setTheme('light')">☀ 日间</button>
       <button class="theme-btn" onclick="setTheme('dark')">🌙 夜间</button>
       <button class="theme-btn" onclick="setTheme('eye-care')">🍃 护眼</button>
+      <span style="margin-left:8px;border-left:1px solid var(--border);padding-left:8px;">
+        <span class="font-label">字号</span>
+        <span class="font-controls">
+          <button class="font-btn" onclick="setFontSize('small')">小</button>
+          <button class="font-btn" onclick="setFontSize('medium')">中</button>
+          <button class="font-btn" onclick="setFontSize('large')">大</button>
+        </span>
+      </span>
     </div>
   </div>
 
@@ -333,6 +351,7 @@ kbd { padding: 2px 6px; background: var(--hover-bg); border: 1px solid var(--bor
     <div class="stat-card right"><div class="num" id="rightCount">0</div><div class="label">答对数</div></div>
     <div class="stat-card wrong"><div class="num" id="wrongCount">0</div><div class="label">答错数</div></div>
     <div class="stat-card rate"><div class="num" id="rateText">0%</div><div class="label">正确率</div></div>
+    <div class="stat-card streak"><div class="num" id="streakCount">0</div><div class="label">🔥 连续天数</div></div>
   </div>
 
   <div class="cat-bar">
@@ -453,6 +472,19 @@ kbd { padding: 2px 6px; background: var(--hover-bg); border: 1px solid var(--bor
       <span><kbd>S</kbd> 发音</span>
       <span><kbd>F</kbd> 收藏</span>
       <span><kbd>R</kbd> 复习进度</span>
+    </div>
+  </div>
+
+  <div class="error-panel" id="changelogPanel" style="margin-top:20px;">
+    <div class="error-panel-header" onclick="this.parentElement.classList.toggle('open')">
+      <h2>📋 更新日志</h2>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="error-panel-body">
+      <div style="padding:12px 18px;font-size:13px;color:var(--text-secondary);">
+        <div style="margin-bottom:8px;"><strong style="color:var(--primary);">v2.1</strong> — 新增：答错自动展示例句+发音、字体大小调节、学习连续天数统计</div>
+        <div><strong style="color:var(--primary);">v2.0</strong> — SM-2间隔重复、智能复习、收藏夹、每日目标、多分类、多难度</div>
+      </div>
     </div>
   </div>
   </div>
@@ -804,6 +836,11 @@ let state = {
   showExample: false,
   // 答题计时
   answerStartTime: 0,
+  // 字号
+  fontSize: "medium",
+  // 连续天数
+  streak: 0,
+  lastPracticeDate: "",
   // SM-2间隔重复数据：{ [wordKey]: { repetition, interval, efactor, nextReview, lastReview } }
   sm2Data: {},
   // 智能复习模式
@@ -982,6 +1019,7 @@ function saveState() {
     theme: state.theme, dailyGoal: state.dailyGoal, todayAnswered: state.todayAnswered,
     todayCorrect: state.todayCorrect, todayDate: state.todayDate,
     sm2Data: state.sm2Data, reviewMode: state.reviewMode,
+    fontSize: state.fontSize, streak: state.streak, lastPracticeDate: state.lastPracticeDate,
   };
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); } catch(e) {}
 }
@@ -1008,6 +1046,9 @@ function loadState() {
       state.todayDate = saved.todayDate || "";
       state.sm2Data = saved.sm2Data || {};
       state.reviewMode = saved.reviewMode || false;
+      state.fontSize = saved.fontSize || "medium";
+      state.streak = saved.streak || 0;
+      state.lastPracticeDate = saved.lastPracticeDate || "";
     }
   } catch(e) {}
 }
@@ -1575,6 +1616,7 @@ function checkAnswer() {
 
   state.totalAnswered++;
   state.todayAnswered++;
+  updateStreak();
   const timeSpent = Date.now() - state.answerStartTime;
   resDom.className = "result show";
 
@@ -1653,6 +1695,17 @@ function checkAnswer() {
     updateStats();
     renderErrorPanel();
     saveState();
+
+    if (state.currentWord.example) {
+      const exDom = document.getElementById('exampleText');
+      exDom.innerText = '📝 ' + state.currentWord.example;
+      exDom.style.display = 'block';
+      state.showExample = true;
+      document.getElementById('exampleBtn').classList.add('active');
+      document.getElementById('exampleBtn').style.background = 'var(--primary)';
+      document.getElementById('exampleBtn').style.color = '#fff';
+    }
+    speakWord();
 
     // 清空输入框，显示照打区域
     document.getElementById("userInput").value = "";
@@ -1949,9 +2002,37 @@ function toggleErrorPanel() {
   document.getElementById("errorPanel").classList.toggle("open");
 }
 
+function setFontSize(size) {
+  state.fontSize = size;
+  const sizes = { small: '14px', medium: '16px', large: '18px' };
+  document.body.style.fontSize = sizes[size] || sizes.medium;
+  document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+  const idx = { small: 0, medium: 1, large: 2 }[size];
+  document.querySelectorAll('.font-btn')[idx]?.classList.add('active');
+  saveState();
+}
+function updateStreak() {
+  const today = new Date().toDateString();
+  if (state.lastPracticeDate === today) return;
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  if (state.lastPracticeDate === yesterday) state.streak++;
+  else state.streak = 1;
+  state.lastPracticeDate = today;
+  document.getElementById('streakCount').innerText = state.streak;
+  saveState();
+}
+
 function init() {
   loadState();
   setTheme(state.theme);
+  if (state.fontSize && state.fontSize !== 'medium') setFontSize(state.fontSize);
+  document.getElementById('streakCount').innerText = state.streak || 0;
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  if (state.lastPracticeDate && state.lastPracticeDate !== today && state.lastPracticeDate !== yesterday) {
+    state.streak = 0;
+    saveState();
+  }
   updateStats();
   updateCategoryUI();
   updateModeUI();
@@ -1962,7 +2043,6 @@ function init() {
   updateReviewModeUI();
   
   // 检查每日日期，重置今日统计
-  const today = new Date().toDateString();
   if (state.todayDate !== today) {
     state.todayDate = today;
     state.todayAnswered = 0;
